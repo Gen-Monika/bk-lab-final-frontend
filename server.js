@@ -110,6 +110,12 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  const nestedAssetIndex = pathname.indexOf("/assets/");
+  if (nestedAssetIndex !== -1) {
+    sendFile(res, safeJoin(pathname.slice(nestedAssetIndex)));
+    return;
+  }
+
   send(res, 404, "Not found", mimeTypes[".txt"]);
 });
 

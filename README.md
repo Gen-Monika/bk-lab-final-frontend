@@ -22,7 +22,7 @@ The frontend looks for the backend API prefix in this order:
 
 Optional BKVision iframe URL can be provided by `BKVISION_DASHBOARD_URL` or the same `Backend` button.
 
-The backend module root returns a JSON health response by design. Public pages avoid server-side HTML placeholders, so scripts and visual assets can load under either Node serving or static serving. If the frontend opens but API data does not load, use the `Backend` button to set the deployed backend URL, then refresh the page.
+The backend module root returns a JSON health response by design. Public pages avoid server-side HTML placeholders, and visual assets are resolved from the loaded runtime script path so they can survive platform URL rewrites. If the frontend opens but API data does not load, use the `Backend` button to set the deployed backend URL, then refresh the page.
 
 ## Local Development
 

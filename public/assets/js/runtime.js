@@ -31,6 +31,26 @@
     return basePath.endsWith("/") ? basePath : `${basePath}/`;
   }
 
+  function runtimeScriptUrl() {
+    const current = document.currentScript;
+    if (current && current.src) return current.src;
+    const scripts = Array.prototype.slice.call(document.getElementsByTagName("script"));
+    const runtimeScript = scripts.filter((script) => (
+      script.src && script.src.indexOf("assets/js/runtime.js") !== -1
+    )).pop();
+    return runtimeScript && runtimeScript.src ? runtimeScript.src : "";
+  }
+
+  function scriptAssetBase() {
+    const scriptUrl = runtimeScriptUrl();
+    if (!scriptUrl) return "";
+    try {
+      return new URL("../../", scriptUrl).href;
+    } catch (error) {
+      return "";
+    }
+  }
+
   function inferredBackend() {
     const firstSegment = window.location.pathname.split("/").filter(Boolean)[0] || "";
     if (/^(stag|prod)--/.test(firstSegment)) {
@@ -52,8 +72,29 @@
   }
 
   function assetUrl(path) {
-    const assetPath = String(path || "").replace(/^\/+/, "");
+    const rawPath = String(path || "").trim();
+    if (/^(https?:)?\/\//.test(rawPath) || rawPath.indexOf("data:") === 0) {
+      return rawPath;
+    }
+    const assetPath = rawPath.replace(/^(\.\/|\.\.\/)+/, "").replace(/^\/+/, "");
+    const base = scriptAssetBase();
+    if (base) {
+      try {
+        return new URL(assetPath, base).href;
+      } catch (error) {
+        return `${appBasePath()}${assetPath}`;
+      }
+    }
     return `${appBasePath()}${assetPath}`;
+  }
+
+  function rewriteAssetAttributes() {
+    document.querySelectorAll("img[src]").forEach((image) => {
+      const src = image.getAttribute("src") || "";
+      if (/^(\.\/|\.\.\/)*assets\//.test(src)) {
+        image.setAttribute("src", assetUrl(src));
+      }
+    });
   }
 
   function configuredBkvisionUrl() {
@@ -98,13 +139,18 @@
   window.FinalApp = {
     apiUrl,
     assetUrl,
+    assetBase: scriptAssetBase,
     backendBase,
     getBkvisionUrl: configuredBkvisionUrl,
   };
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initRuntimeSettingsButtons);
+    document.addEventListener("DOMContentLoaded", () => {
+      initRuntimeSettingsButtons();
+      rewriteAssetAttributes();
+    });
   } else {
     initRuntimeSettingsButtons();
+    rewriteAssetAttributes();
   }
 })();
