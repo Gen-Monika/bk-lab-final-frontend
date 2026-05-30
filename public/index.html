@@ -1373,6 +1373,9 @@ function normalizeBkvisionUrl(value) {
     if (!/^https?:\/\//i.test(decodedUrl)) {
         return "";
     }
+    if (decodedUrl.indexOf("http://") === 0) {
+        return `https://${decodedUrl.slice("http://".length)}`;
+    }
     return decodedUrl;
 }
 

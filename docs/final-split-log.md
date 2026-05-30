@@ -21,6 +21,7 @@ Created the separated frontend repository for the final BlueKing SaaS project. T
 - Added BKVision embed URL normalization and a direct-open diagnostic link for iframe troubleshooting.
 - Added a visible BKVision configuration state so missing dashboard URLs can be distinguished from iframe blocking.
 - Loaded BKVision embed configuration during dashboard initialization and refresh so saved dashboard URLs render immediately.
+- Normalized BKVision embed URLs from HTTP to HTTPS to match the platform's accessible embed endpoint.
 
 ## Verification Targets
 
