@@ -16,6 +16,7 @@ Created the separated frontend repository for the final BlueKing SaaS project. T
 - Preserved the paged Help guides, archive controls, draggable desktop pet, and background selectors.
 - Aligned the BlueKing app descriptor with the platform parser by using the `NodeJS` language value and Node `>=10.10.0` engine declaration.
 - Hardened BlueKing path-prefix handling for runtime scripts, help screenshots, pet images, and switchable backgrounds so nested pages load assets correctly after deployment.
+- Removed runtime placeholder requirements from public HTML pages so the frontend remains interactive even when the platform serves files as static assets.
 
 ## Verification Targets
 

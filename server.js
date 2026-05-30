@@ -69,6 +69,12 @@ function sendHtml(res, filePath, basePath) {
   const configScript = `<script>window.__APP_CONFIG__ = ${JSON.stringify(runtimeConfig(basePath))};</script>`;
   html = replaceAllTokens(html, "%APP_BASE%", basePath);
   html = replaceAllTokens(html, "%APP_CONFIG_SCRIPT%", configScript);
+  if (!html.includes("window.__APP_CONFIG__")) {
+    html = html.replace(
+      /(\s*<script src="(?:\.\.\/)?assets\/js\/runtime\.js"><\/script>)/,
+      `\n    ${configScript}$1`,
+    );
+  }
   send(res, 200, html, mimeTypes[".html"]);
 }
 
