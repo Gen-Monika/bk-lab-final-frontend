@@ -1388,7 +1388,12 @@ async function loadBkvisionConfig() {
     }
     renderBkvisionEmbed(dashboardUrl);
 }
-document.getElementById("refreshBtn").addEventListener("click", loadSummary);
+function refreshDashboard() {
+    loadSummary();
+    loadBkvisionConfig();
+}
+
+document.getElementById("refreshBtn").addEventListener("click", refreshDashboard);
 document.getElementById("toggleArchivedCounts").addEventListener("click", () => {
     displayState.showArchivedCounts = !displayState.showArchivedCounts;
     renderCounts();
@@ -1459,7 +1464,7 @@ document.getElementById("eventTableBody").addEventListener("click", (event) => {
 });
 initBackgroundTools();
 initPet();
-loadSummary();
+refreshDashboard();
 initGuideModal("bkvision-dashboard.guide.seen.v1");
 </script>
 </body>
