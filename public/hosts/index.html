@@ -3,13 +3,13 @@
 <head>
     <base href="%APP_BASE%">
     %APP_CONFIG_SCRIPT%
-    <script src="assets/js/runtime.js"></script>
+    <script src="%APP_BASE%assets/js/runtime.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CMDB Host Manager</title>
     <style>
         :root {
-            --page-bg: url("assets/hosts/visuals/bg/feather_sky.png");
+            --page-bg: url("%APP_BASE%assets/hosts/visuals/bg/feather_sky.png");
             --ink: #182033;
             --muted: #687386;
             --line: #dfe6f0;
@@ -746,7 +746,7 @@
     <div class="guide-dialog">
         <button class="guide-close" type="button" data-guide-close aria-label="Close">×</button>
         <section class="guide-slide active" data-guide-slide>
-            <figure><img src="assets/hosts/help/lab4-host-ui.jpg" alt="Custom CMDB UI"></figure>
+            <figure><img src="%APP_BASE%assets/hosts/help/lab4-host-ui.jpg" alt="Custom CMDB UI"></figure>
             <article>
                 <p class="guide-kicker">Lab 2 · CMDB</p>
                 <h2 id="guideTitle">个性化主机管理界面</h2>
@@ -758,7 +758,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/hosts/help/lab4-host-cascade.jpg" alt="Business to module cascade"></figure>
+            <figure><img src="%APP_BASE%assets/hosts/help/lab4-host-cascade.jpg" alt="Business to module cascade"></figure>
             <article>
                 <p class="guide-kicker">筛选联动</p>
                 <h2>业务 / 集群 / 模块级联查询</h2>
@@ -770,7 +770,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/hosts/help/lab4-host-list.jpg" alt="Host list"></figure>
+            <figure><img src="%APP_BASE%assets/hosts/help/lab4-host-list.jpg" alt="Host list"></figure>
             <article>
                 <p class="guide-kicker">主机列表</p>
                 <h2>主机搜索结果与快捷详情</h2>
@@ -782,7 +782,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/hosts/help/lab4-host-detail.jpg" alt="Host detail"></figure>
+            <figure><img src="%APP_BASE%assets/hosts/help/lab4-host-detail.jpg" alt="Host detail"></figure>
             <article>
                 <p class="guide-kicker">主机详情</p>
                 <h2>收敛后的主机明细字段</h2>
@@ -802,7 +802,7 @@
 </div>
 
 <aside class="pet-dock" id="petDock" aria-label="Desktop pet">
-    <img class="pet-body" id="petBody" src="assets/hosts/visuals/pets/noa.png" alt="Noa" draggable="false">
+    <img class="pet-body" id="petBody" src="%APP_BASE%assets/hosts/visuals/pets/noa.png" alt="Noa" draggable="false">
     <div class="pet-controls">
         <select class="pet-select" id="petSelect" aria-label="Pet">
             <option value="noa">Noa</option>
@@ -817,6 +817,7 @@
 
 <script>
 const apiUrl = window.FinalApp.apiUrl;
+const assetUrl = window.FinalApp.assetUrl;
 const endpoints = {
     businesses: apiUrl("/hosts/api/businesses/"),
     sets: apiUrl("/hosts/api/sets/"),
@@ -826,17 +827,17 @@ const endpoints = {
 
 const visualAssets = {
     backgrounds: {
-        feather: "assets/hosts/visuals/bg/feather_sky.png",
-        lighthouse: "assets/hosts/visuals/bg/sunny_lighthouse.png",
-        clubroom: "assets/hosts/visuals/bg/clubroom.png",
-        beach: "assets/hosts/visuals/bg/beach.png",
+        feather: assetUrl("assets/hosts/visuals/bg/feather_sky.png"),
+        lighthouse: assetUrl("assets/hosts/visuals/bg/sunny_lighthouse.png"),
+        clubroom: assetUrl("assets/hosts/visuals/bg/clubroom.png"),
+        beach: assetUrl("assets/hosts/visuals/bg/beach.png"),
     },
     pets: {
-        noa: "assets/hosts/visuals/pets/noa.png",
-        amane: "assets/hosts/visuals/pets/amane.png",
-        kurumi: "assets/hosts/visuals/pets/kurumi.png",
-        kaguya: "assets/hosts/visuals/pets/kaguya.png",
-        orie: "assets/hosts/visuals/pets/orie.png",
+        noa: assetUrl("assets/hosts/visuals/pets/noa.png"),
+        amane: assetUrl("assets/hosts/visuals/pets/amane.png"),
+        kurumi: assetUrl("assets/hosts/visuals/pets/kurumi.png"),
+        kaguya: assetUrl("assets/hosts/visuals/pets/kaguya.png"),
+        orie: assetUrl("assets/hosts/visuals/pets/orie.png"),
     },
 };
 

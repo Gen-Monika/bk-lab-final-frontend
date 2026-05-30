@@ -3,13 +3,13 @@
 <head>
     <base href="%APP_BASE%">
     %APP_CONFIG_SCRIPT%
-    <script src="assets/js/runtime.js"></script>
+    <script src="%APP_BASE%assets/js/runtime.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>JOB Log Backup Console</title>
     <style>
         :root {
-            --page-bg: url("assets/hosts/visuals/bg/sunny_lighthouse.png");
+            --page-bg: url("%APP_BASE%assets/hosts/visuals/bg/sunny_lighthouse.png");
             --bg: #eef3f8;
             --panel: #ffffff;
             --ink: #1d2738;
@@ -897,7 +897,7 @@
     <div class="guide-dialog">
         <button class="guide-close" type="button" data-guide-close aria-label="Close">×</button>
         <section class="guide-slide active" data-guide-slide>
-            <figure><img src="assets/jobs/help/lab4-job-console.jpg" alt="JOB console"></figure>
+            <figure><img src="%APP_BASE%assets/jobs/help/lab4-job-console.jpg" alt="JOB console"></figure>
             <article>
                 <p class="guide-kicker">Lab 3 · JOB</p>
                 <h2 id="guideTitle">作业平台控制台</h2>
@@ -909,7 +909,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/jobs/help/lab4-job-records.jpg" alt="Waiting execution records"></figure>
+            <figure><img src="%APP_BASE%assets/jobs/help/lab4-job-records.jpg" alt="Waiting execution records"></figure>
             <article>
                 <p class="guide-kicker">执行记录</p>
                 <h2>查询申请与执行状态</h2>
@@ -921,7 +921,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/jobs/help/lab4-job-pass.jpg" alt="Approved execution"></figure>
+            <figure><img src="%APP_BASE%assets/jobs/help/lab4-job-pass.jpg" alt="Approved execution"></figure>
             <article>
                 <p class="guide-kicker">平台通过</p>
                 <h2>作业平台执行链路</h2>
@@ -933,7 +933,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/jobs/help/lab4-job-result.jpg" alt="Structured file result"></figure>
+            <figure><img src="%APP_BASE%assets/jobs/help/lab4-job-result.jpg" alt="Structured file result"></figure>
             <article>
                 <p class="guide-kicker">结果展示</p>
                 <h2>文件查询与备份结果</h2>
@@ -945,7 +945,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/jobs/help/lab4-job-archive.jpg" alt="Archive controls"></figure>
+            <figure><img src="%APP_BASE%assets/jobs/help/lab4-job-archive.jpg" alt="Archive controls"></figure>
             <article>
                 <p class="guide-kicker">整理归档</p>
                 <h2>批量归档与恢复</h2>
@@ -965,7 +965,7 @@
 </div>
 
 <aside class="pet-dock" id="petDock" aria-label="Desktop pet">
-    <img class="pet-body" id="petBody" src="assets/hosts/visuals/pets/noa.png" alt="Noa" draggable="false">
+    <img class="pet-body" id="petBody" src="%APP_BASE%assets/hosts/visuals/pets/noa.png" alt="Noa" draggable="false">
     <div class="pet-controls">
         <select class="pet-select" id="petSelect" aria-label="Pet">
             <option value="noa">Noa</option>
@@ -980,6 +980,7 @@
 
 <script>
 const apiUrl = window.FinalApp.apiUrl;
+const assetUrl = window.FinalApp.assetUrl;
 const endpoints = {
     businesses: apiUrl("/jobs/api/businesses/"),
     hosts: apiUrl("/jobs/api/hosts/"),
@@ -991,17 +992,17 @@ const endpoints = {
 
 const visualAssets = {
     backgrounds: {
-        lighthouse: "assets/hosts/visuals/bg/sunny_lighthouse.png",
-        feather: "assets/hosts/visuals/bg/feather_sky.png",
-        clubroom: "assets/hosts/visuals/bg/clubroom.png",
-        beach: "assets/hosts/visuals/bg/beach.png",
+        lighthouse: assetUrl("assets/hosts/visuals/bg/sunny_lighthouse.png"),
+        feather: assetUrl("assets/hosts/visuals/bg/feather_sky.png"),
+        clubroom: assetUrl("assets/hosts/visuals/bg/clubroom.png"),
+        beach: assetUrl("assets/hosts/visuals/bg/beach.png"),
     },
     pets: {
-        noa: "assets/hosts/visuals/pets/noa.png",
-        amane: "assets/hosts/visuals/pets/amane.png",
-        kurumi: "assets/hosts/visuals/pets/kurumi.png",
-        kaguya: "assets/hosts/visuals/pets/kaguya.png",
-        orie: "assets/hosts/visuals/pets/orie.png",
+        noa: assetUrl("assets/hosts/visuals/pets/noa.png"),
+        amane: assetUrl("assets/hosts/visuals/pets/amane.png"),
+        kurumi: assetUrl("assets/hosts/visuals/pets/kurumi.png"),
+        kaguya: assetUrl("assets/hosts/visuals/pets/kaguya.png"),
+        orie: assetUrl("assets/hosts/visuals/pets/orie.png"),
     },
 };
 

@@ -22,6 +22,8 @@ The frontend looks for the backend API prefix in this order:
 
 Optional BKVision iframe URL can be provided by `BKVISION_DASHBOARD_URL` or the same `Backend` button.
 
+The backend module root returns a JSON health response by design. If the frontend opens but API data does not load, use the `Backend` button to set the deployed backend URL, then refresh the page.
+
 ## Local Development
 
 ```powershell

@@ -15,6 +15,22 @@
     return trimTrailingSlash(config.backendApiPrefix || "");
   }
 
+  function configuredBasePath() {
+    const config = window.__APP_CONFIG__ || {};
+    const basePath = String(config.basePath || "").trim();
+    return basePath;
+  }
+
+  function inferredBasePath() {
+    const firstSegment = window.location.pathname.split("/").filter(Boolean)[0] || "";
+    return /^(stag|prod)--/.test(firstSegment) ? `/${firstSegment}/` : "/";
+  }
+
+  function appBasePath() {
+    const basePath = configuredBasePath() || inferredBasePath();
+    return basePath.endsWith("/") ? basePath : `${basePath}/`;
+  }
+
   function inferredBackend() {
     const firstSegment = window.location.pathname.split("/").filter(Boolean)[0] || "";
     if (/^(stag|prod)--/.test(firstSegment)) {
@@ -33,6 +49,11 @@
   function apiUrl(path) {
     const route = String(path || "").startsWith("/") ? path : `/${path}`;
     return `${backendBase()}${route}`;
+  }
+
+  function assetUrl(path) {
+    const assetPath = String(path || "").replace(/^\/+/, "");
+    return `${appBasePath()}${assetPath}`;
   }
 
   function configuredBkvisionUrl() {
@@ -76,6 +97,7 @@
 
   window.FinalApp = {
     apiUrl,
+    assetUrl,
     backendBase,
     getBkvisionUrl: configuredBkvisionUrl,
   };

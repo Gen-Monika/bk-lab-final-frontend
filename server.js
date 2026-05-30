@@ -60,12 +60,15 @@ function runtimeConfig(basePath) {
   };
 }
 
+function replaceAllTokens(value, token, replacement) {
+  return value.split(token).join(replacement);
+}
+
 function sendHtml(res, filePath, basePath) {
   let html = fs.readFileSync(filePath, "utf8");
   const configScript = `<script>window.__APP_CONFIG__ = ${JSON.stringify(runtimeConfig(basePath))};</script>`;
-  html = html
-    .replace("%APP_BASE%", basePath)
-    .replace("%APP_CONFIG_SCRIPT%", configScript);
+  html = replaceAllTokens(html, "%APP_BASE%", basePath);
+  html = replaceAllTokens(html, "%APP_CONFIG_SCRIPT%", configScript);
   send(res, 200, html, mimeTypes[".html"]);
 }
 

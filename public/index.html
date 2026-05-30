@@ -3,13 +3,13 @@
 <head>
     <base href="%APP_BASE%">
     %APP_CONFIG_SCRIPT%
-    <script src="assets/js/runtime.js"></script>
+    <script src="%APP_BASE%assets/js/runtime.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>BKVision Behavior Dashboard</title>
     <style>
         :root {
-            --page-bg: url("assets/hosts/visuals/bg/feather_sky.png");
+            --page-bg: url("%APP_BASE%assets/hosts/visuals/bg/feather_sky.png");
             --ink: #1d2738;
             --muted: #667085;
             --line: #dce4ef;
@@ -520,7 +520,8 @@
         @media (max-width: 640px) {
             .shell {
                 padding: 14px;
-    
+            }
+
             .guide-dialog {
                 max-height: calc(100vh - 28px);
                 overflow-y: auto;
@@ -544,8 +545,6 @@
                 position: sticky;
                 bottom: 0;
             }
-
-        }
 
             .segmented {
                 width: 100%;
@@ -679,7 +678,7 @@
     <div class="guide-dialog">
         <button class="guide-close" type="button" data-guide-close aria-label="Close">×</button>
         <section class="guide-slide active" data-guide-slide>
-            <figure><img src="assets/analytics/help/lab4-console.jpg" alt="Behavior analytics console"></figure>
+            <figure><img src="%APP_BASE%assets/analytics/help/lab4-console.jpg" alt="Behavior analytics console"></figure>
             <article>
                 <p class="guide-kicker">Lab 4 · BKVision</p>
                 <h2 id="guideTitle">用户行为采集面板</h2>
@@ -691,7 +690,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/analytics/help/lab4-archive.jpg" alt="Analytics archive controls"></figure>
+            <figure><img src="%APP_BASE%assets/analytics/help/lab4-archive.jpg" alt="Analytics archive controls"></figure>
             <article>
                 <p class="guide-kicker">事件管理</p>
                 <h2>行为记录归档与多选</h2>
@@ -703,7 +702,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/analytics/help/lab4-bkvision-datasource.jpg" alt="BKVision datasource"></figure>
+            <figure><img src="%APP_BASE%assets/analytics/help/lab4-bkvision-datasource.jpg" alt="BKVision datasource"></figure>
             <article>
                 <p class="guide-kicker">数据源</p>
                 <h2>BKVision 连接 SaaS 数据库</h2>
@@ -715,7 +714,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/analytics/help/lab4-bkvision-dashboard.jpg" alt="BKVision dashboard"></figure>
+            <figure><img src="%APP_BASE%assets/analytics/help/lab4-bkvision-dashboard.jpg" alt="BKVision dashboard"></figure>
             <article>
                 <p class="guide-kicker">可视化</p>
                 <h2>行为类型分布与接口排行</h2>
@@ -727,7 +726,7 @@
             </article>
         </section>
         <section class="guide-slide" data-guide-slide>
-            <figure><img src="assets/analytics/help/lab4-embed.jpg" alt="Embedded BKVision dashboard"></figure>
+            <figure><img src="%APP_BASE%assets/analytics/help/lab4-embed.jpg" alt="Embedded BKVision dashboard"></figure>
             <article>
                 <p class="guide-kicker">嵌入展示</p>
                 <h2>SaaS 页面嵌入 BKVision</h2>
@@ -746,7 +745,7 @@
     </div>
 </div>
 <aside class="pet-dock" id="petDock" aria-label="Desktop pet">
-    <img class="pet-body" id="petBody" src="assets/hosts/visuals/pets/noa.png" alt="Noa" draggable="false">
+    <img class="pet-body" id="petBody" src="%APP_BASE%assets/hosts/visuals/pets/noa.png" alt="Noa" draggable="false">
     <div class="pet-controls">
         <select class="pet-select" id="petSelect" aria-label="Pet">
             <option value="noa">Noa</option>
@@ -762,6 +761,7 @@
 <script>
 
 const apiUrl = window.FinalApp.apiUrl;
+const assetUrl = window.FinalApp.assetUrl;
 
 function initGuideModal(storageKey) {
     const modal = document.getElementById("guideModal");
@@ -841,17 +841,17 @@ const endpoints = {
 
 const visualAssets = {
     backgrounds: {
-        feather: "assets/hosts/visuals/bg/feather_sky.png",
-        lighthouse: "assets/hosts/visuals/bg/sunny_lighthouse.png",
-        clubroom: "assets/hosts/visuals/bg/clubroom.png",
-        beach: "assets/hosts/visuals/bg/beach.png",
+        feather: assetUrl("assets/hosts/visuals/bg/feather_sky.png"),
+        lighthouse: assetUrl("assets/hosts/visuals/bg/sunny_lighthouse.png"),
+        clubroom: assetUrl("assets/hosts/visuals/bg/clubroom.png"),
+        beach: assetUrl("assets/hosts/visuals/bg/beach.png"),
     },
     pets: {
-        noa: "assets/hosts/visuals/pets/noa.png",
-        amane: "assets/hosts/visuals/pets/amane.png",
-        kurumi: "assets/hosts/visuals/pets/kurumi.png",
-        kaguya: "assets/hosts/visuals/pets/kaguya.png",
-        orie: "assets/hosts/visuals/pets/orie.png",
+        noa: assetUrl("assets/hosts/visuals/pets/noa.png"),
+        amane: assetUrl("assets/hosts/visuals/pets/amane.png"),
+        kurumi: assetUrl("assets/hosts/visuals/pets/kurumi.png"),
+        kaguya: assetUrl("assets/hosts/visuals/pets/kaguya.png"),
+        orie: assetUrl("assets/hosts/visuals/pets/orie.png"),
     },
 };
 
