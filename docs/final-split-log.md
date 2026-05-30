@@ -19,6 +19,7 @@ Created the separated frontend repository for the final BlueKing SaaS project. T
 - Removed runtime placeholder requirements from public HTML pages so the frontend remains interactive even when the platform serves files as static assets.
 - Derived asset URLs from the loaded runtime script path and added nested asset route fallback to keep images available across platform URL rewrites.
 - Added BKVision embed URL normalization and a direct-open diagnostic link for iframe troubleshooting.
+- Added a visible BKVision configuration state so missing dashboard URLs can be distinguished from iframe blocking.
 
 ## Verification Targets
 

@@ -141,6 +141,7 @@
     assetUrl,
     assetBase: scriptAssetBase,
     backendBase,
+    configureRuntime: saveRuntimeSettings,
     getBkvisionUrl: configuredBkvisionUrl,
   };
 

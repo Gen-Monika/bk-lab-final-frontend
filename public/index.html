@@ -273,6 +273,14 @@
             white-space: nowrap;
         }
 
+        .iframe-empty-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
         .iframe-wrap iframe {
             width: 100%;
             height: 680px;
@@ -1321,7 +1329,20 @@ function renderBkvisionEmbed(url) {
     if (!wrap) return;
     const safeUrl = normalizeBkvisionUrl(url);
     if (!safeUrl) {
-        wrap.innerHTML = '<div class="empty" id="bkvisionEmpty">Configure BKVision dashboard URL from Backend settings or platform variables.</div>';
+        wrap.innerHTML = `
+            <div class="empty" id="bkvisionEmpty">
+                <div>
+                    <p>BKVision dashboard URL is not configured.</p>
+                    <div class="iframe-empty-actions">
+                        <button class="btn" type="button" id="configureBkvisionBtn">Configure</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        const configureButton = document.getElementById("configureBkvisionBtn");
+        if (configureButton && window.FinalApp.configureRuntime) {
+            configureButton.addEventListener("click", window.FinalApp.configureRuntime);
+        }
         return;
     }
     const iframe = document.createElement("iframe");
@@ -1351,9 +1372,6 @@ function normalizeBkvisionUrl(value) {
     const decodedUrl = url.replace(/&amp;/g, "&").trim();
     if (!/^https?:\/\//i.test(decodedUrl)) {
         return "";
-    }
-    if (window.location.protocol === "https:" && decodedUrl.indexOf("http://") === 0) {
-        return `https://${decodedUrl.slice("http://".length)}`;
     }
     return decodedUrl;
 }
