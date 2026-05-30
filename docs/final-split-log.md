@@ -14,6 +14,7 @@ Created the separated frontend repository for the final BlueKing SaaS project. T
 - Added runtime backend API detection through `BK_BACKEND_API_PREFIX`, BlueKing path inference, and a browser-saved Backend settings button.
 - Added optional BKVision iframe URL configuration through environment variable or browser runtime setting.
 - Preserved the paged Help guides, archive controls, draggable desktop pet, and background selectors.
+- Aligned the BlueKing app descriptor with the platform parser by using the `NodeJS` language value and Node `>=10.10.0` engine declaration.
 
 ## Verification Targets
 

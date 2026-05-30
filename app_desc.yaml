@@ -1,6 +1,6 @@
 specVersion: 3
 module:
-  language: Node.js
+  language: NodeJS
   spec:
     processes:
       - name: web
