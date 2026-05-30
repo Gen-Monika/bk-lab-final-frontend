@@ -1,0 +1,1399 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="%APP_BASE%">
+    %APP_CONFIG_SCRIPT%
+    <script src="assets/js/runtime.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BKVision Behavior Dashboard</title>
+    <style>
+        :root {
+            --page-bg: url("assets/hosts/visuals/bg/feather_sky.png");
+            --ink: #1d2738;
+            --muted: #667085;
+            --line: #dce4ef;
+            --panel: rgba(255, 255, 255, 0.94);
+            --accent: #2268f5;
+            --accent-soft: #edf4ff;
+            --shadow: 0 14px 36px rgba(32, 44, 72, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: var(--ink);
+            font: 14px/1.5 Arial, "Microsoft YaHei", sans-serif;
+            background:
+                linear-gradient(180deg, rgba(239, 246, 255, 0.58), rgba(243, 246, 249, 0.78)),
+                var(--page-bg) center / cover fixed no-repeat;
+        }
+
+        button,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .shell {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 22px;
+        }
+
+        .topbar,
+        .panel {
+            background: var(--panel);
+            border: 1px solid rgba(220, 228, 239, 0.95);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(4px);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 14px 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #2268f5, #10a37f);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
+        .brand p {
+            margin: 2px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .topbar-right,
+        .nav-links,
+        .segmented {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .segmented {
+            gap: 4px;
+            padding: 4px;
+            background: rgba(237, 244, 255, 0.9);
+            border: 1px solid rgba(204, 216, 236, 0.95);
+            border-radius: 8px;
+        }
+
+        .segmented button {
+            min-width: 84px;
+            height: 30px;
+            padding: 0 9px;
+            color: #445066;
+            background: transparent;
+            border: 0;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .segmented button.active {
+            color: #17345f;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(37, 52, 82, 0.12);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            padding: 0 12px;
+            color: #245fc7;
+            background: #fff;
+            border: 1px solid #b9cae8;
+            border-radius: 6px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            align-items: start;
+        }
+
+        .panel {
+            padding: 16px;
+        }
+
+        .panel h2 {
+            margin: 0 0 12px;
+            font-size: 16px;
+        }
+
+        .section-header,
+        .archive-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .section-header {
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+        }
+
+        .archive-actions .btn {
+            height: 30px;
+            padding: 0 10px;
+            font-size: 12px;
+        }
+
+        .select-cell {
+            width: 34px;
+            text-align: center;
+        }
+
+        .metric {
+            color: var(--accent);
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 520px;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        th,
+        td {
+            padding: 10px 9px;
+            border-bottom: 1px solid #edf1f7;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            color: #526071;
+            background: #f7f9fd;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        tr.archived-row td {
+            background: #fff8e6;
+        }
+
+        .link-button {
+            padding: 0;
+            color: #245fc7;
+            background: none;
+            border: 0;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .wide {
+            grid-column: 1 / -1;
+        }
+
+        .iframe-wrap {
+            min-height: 520px;
+            overflow: hidden;
+            border: 1px solid #dce4ef;
+            border-radius: 8px;
+            background: #f8fbff;
+        }
+
+        .iframe-wrap iframe {
+            width: 100%;
+            height: 720px;
+            border: 0;
+        }
+
+        .empty {
+            display: grid;
+            place-items: center;
+            min-height: 260px;
+            color: var(--muted);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .pet-dock {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 168px;
+            z-index: 30;
+            user-select: none;
+            touch-action: none;
+            will-change: transform;
+        }
+
+        .pet-body {
+            display: block;
+            width: 100%;
+            height: 172px;
+            object-fit: contain;
+            object-position: bottom center;
+            cursor: grab;
+            filter: drop-shadow(0 14px 18px rgba(24, 32, 51, 0.22));
+            -webkit-user-drag: none;
+            user-drag: none;
+        }
+
+        .pet-controls {
+            display: grid;
+            grid-template-columns: 1fr 34px;
+            gap: 6px;
+            align-items: center;
+            margin-top: 4px;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.88);
+            border: 1px solid rgba(214, 222, 235, 0.96);
+            border-radius: 8px;
+            box-shadow: 0 8px 18px rgba(32, 44, 72, 0.12);
+            backdrop-filter: blur(8px);
+        }
+
+        .pet-select {
+            width: 100%;
+            height: 30px;
+            padding: 0 6px;
+            color: var(--ink);
+            background: #fff;
+            border: 1px solid #cbd6e4;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .pet-reset {
+            width: 30px;
+            height: 30px;
+            color: #42526a;
+            background: #f5f8fc;
+            border: 1px solid #d9e1ec;
+            border-radius: 6px;
+        }
+
+
+        body.guide-open {
+            overflow: hidden;
+        }
+
+        .guide-help-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            padding: 0 12px;
+            color: #245fc7;
+            background: #fff;
+            border: 1px solid #b9cae8;
+            border-radius: 6px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .guide-help-button:hover {
+            color: #fff;
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .guide-modal[hidden] {
+            display: none !important;
+        }
+
+        .guide-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .guide-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(6px);
+        }
+
+        .guide-dialog {
+            position: relative;
+            width: min(1000px, 100%);
+            max-height: min(780px, calc(100vh - 48px));
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid rgba(220, 228, 239, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 30px 84px rgba(15, 23, 42, 0.3);
+        }
+
+        .guide-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 2;
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            color: #526071;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        .guide-slide {
+            display: none;
+            grid-template-columns: minmax(0, 1.18fr) minmax(290px, 0.82fr);
+            gap: 24px;
+            padding: 28px;
+        }
+
+        .guide-slide.active {
+            display: grid;
+        }
+
+        .guide-slide figure {
+            margin: 0;
+            overflow: hidden;
+            background: #f4f7fb;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .guide-slide img {
+            display: block;
+            width: 100%;
+            height: 360px;
+            object-fit: contain;
+            object-position: center;
+        }
+
+        .guide-slide article {
+            align-self: center;
+        }
+
+        .guide-kicker {
+            margin: 0 0 8px;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .guide-slide h2 {
+            margin: 0 0 12px;
+            color: var(--ink);
+            font-size: 26px;
+            line-height: 1.16;
+        }
+
+        .guide-slide p,
+        .guide-slide li {
+            color: var(--muted);
+            line-height: 1.72;
+        }
+
+        .guide-slide ul {
+            margin: 12px 0 0;
+            padding-left: 18px;
+        }
+
+        .guide-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 20px;
+            background: #f8fafc;
+            border-top: 1px solid var(--line);
+        }
+
+        .guide-nav {
+            min-width: 96px;
+            height: 36px;
+            padding: 0 14px;
+            color: #344054;
+            background: #fff;
+            border: 1px solid #cfd8e6;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .guide-nav.primary {
+            color: #fff;
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .guide-nav:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .guide-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .guide-dots button {
+            width: 9px;
+            height: 9px;
+            padding: 0;
+            background: #cbd5e1;
+            border: 0;
+            border-radius: 999px;
+        }
+
+        .guide-dots button.active {
+            width: 22px;
+            background: var(--accent);
+        }
+
+        @media (max-width: 980px) {
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                padding: 14px;
+    
+            .guide-dialog {
+                max-height: calc(100vh - 28px);
+                overflow-y: auto;
+            }
+
+            .guide-slide,
+            .guide-slide.active {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .guide-slide img {
+                height: 260px;
+            }
+
+            .guide-slide h2 {
+                font-size: 22px;
+            }
+
+            .guide-footer {
+                position: sticky;
+                bottom: 0;
+            }
+
+        }
+
+            .segmented {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .pet-dock {
+                width: 138px;
+            }
+
+            .pet-body {
+                height: 144px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">BKV</div>
+            <div>
+                <h1>BKVision Behavior Dashboard</h1>
+                <p>User behavior analytics for CMDB and JOB workflows</p>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <nav class="nav-links" aria-label="Application navigation">
+                <a class="btn" href="jobs/">JOB Console</a>
+                <a class="btn" href="hosts/">Host Manager</a>
+            </nav>
+            <div class="segmented" id="backgroundTools" aria-label="Background">
+                <button class="active" type="button" data-bg="feather">Feather sky</button>
+                <button type="button" data-bg="lighthouse">Lighthouse</button>
+                <button type="button" data-bg="clubroom">Clubroom</button>
+                <button type="button" data-bg="beach">Beach</button>
+            </div>
+            <button class="btn" id="refreshBtn" type="button">Refresh</button><button class="btn" type="button" data-backend-settings>Backend</button>
+            <button class="guide-help-button" type="button" data-guide-open>Help</button>
+        </div>
+    </header>
+
+    <main class="grid">
+        <section class="panel">
+            <h2>Total API Calls</h2>
+            <div class="metric" id="totalCalls">0</div>
+        </section>
+        <section class="panel">
+            <h2>Tracked APIs</h2>
+            <div class="metric" id="trackedApis">0</div>
+        </section>
+        <section class="panel">
+            <h2>Backup Actions</h2>
+            <div class="metric" id="backupActions">0</div>
+        </section>
+
+        <section class="panel wide">
+            <div class="section-header">
+                <h2>Local Behavior Data</h2>
+                <div class="archive-actions">
+                    <button class="btn" type="button" id="toggleArchivedCounts">Show Archived (0)</button>
+                    <button class="btn" type="button" id="selectCounts">Select</button>
+                    <button class="btn" type="button" id="selectArchivedCounts" disabled>Select Archived</button>
+                    <button class="btn" type="button" id="selectUnarchivedCounts" disabled>Select Unarchived</button>
+                    <button class="btn" type="button" id="invertCountSelection" disabled>Invert Selection</button>
+                    <button class="btn" type="button" id="archiveSelectedCounts" disabled>Archive Selected</button>
+                    <button class="btn" type="button" id="restoreSelectedCounts" disabled>Restore Selected</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="select-cell count-selection-column">Select</th>
+                            <th>Category</th>
+                            <th>API</th>
+                            <th>Count</th>
+                            <th>Last user</th>
+                            <th>Last path</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="countTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel wide">
+            <div class="section-header">
+                <h2>Recent Events</h2>
+                <div class="archive-actions">
+                    <button class="btn" type="button" id="toggleArchivedEvents">Show Archived (0)</button>
+                    <button class="btn" type="button" id="selectEvents">Select</button>
+                    <button class="btn" type="button" id="selectArchivedEvents" disabled>Select Archived</button>
+                    <button class="btn" type="button" id="selectUnarchivedEvents" disabled>Select Unarchived</button>
+                    <button class="btn" type="button" id="invertEventSelection" disabled>Invert Selection</button>
+                    <button class="btn" type="button" id="archiveSelectedEvents" disabled>Archive Selected</button>
+                    <button class="btn" type="button" id="restoreSelectedEvents" disabled>Restore Selected</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="select-cell event-selection-column">Select</th>
+                            <th>Time</th>
+                            <th>User</th>
+                            <th>Category</th>
+                            <th>API</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel wide">
+            <h2>BKVision Embed</h2>
+            <div class="iframe-wrap" id="bkvisionFrameWrap"><div class="empty" id="bkvisionEmpty">Configure BKVision dashboard URL from Backend settings or platform variables.</div></div>
+        </section>
+    </main>
+</div>
+
+
+
+<div class="guide-modal" id="guideModal" aria-modal="true" role="dialog" aria-labelledby="guideTitle" hidden>
+    <div class="guide-backdrop" data-guide-close></div>
+    <div class="guide-dialog">
+        <button class="guide-close" type="button" data-guide-close aria-label="Close">×</button>
+        <section class="guide-slide active" data-guide-slide>
+            <figure><img src="assets/analytics/help/lab4-console.jpg" alt="Behavior analytics console"></figure>
+            <article>
+                <p class="guide-kicker">Lab 4 · BKVision</p>
+                <h2 id="guideTitle">用户行为采集面板</h2>
+                <p>Django 中间件采集 CMDB 和 JOB 相关接口访问，将 API 类别、名称、用户、状态码和耗时写入数据库。</p>
+                <ul>
+                    <li>统计卡片展示总调用量、API 数和备份动作数。</li>
+                    <li>采集异常被隔离，不影响原业务请求。</li>
+                </ul>
+            </article>
+        </section>
+        <section class="guide-slide" data-guide-slide>
+            <figure><img src="assets/analytics/help/lab4-archive.jpg" alt="Analytics archive controls"></figure>
+            <article>
+                <p class="guide-kicker">事件管理</p>
+                <h2>行为记录归档与多选</h2>
+                <p>本地行为表支持归档、恢复、按归档状态批量选择和反向选择，使大量测试事件也能保持可读。</p>
+                <ul>
+                    <li>聚合 API 数据和明细事件都支持整理。</li>
+                    <li>与 Lab3 执行记录管理交互保持一致。</li>
+                </ul>
+            </article>
+        </section>
+        <section class="guide-slide" data-guide-slide>
+            <figure><img src="assets/analytics/help/lab4-bkvision-datasource.jpg" alt="BKVision datasource"></figure>
+            <article>
+                <p class="guide-kicker">数据源</p>
+                <h2>BKVision 连接 SaaS 数据库</h2>
+                <p>BKVision 通过 SaaS MySQL 数据源读取中间件写入的统计表和明细表，为图表配置提供数据基础。</p>
+                <ul>
+                    <li>数据源与应用数据库保持一致。</li>
+                    <li>图表查询使用 SQL 聚合行为数据。</li>
+                </ul>
+            </article>
+        </section>
+        <section class="guide-slide" data-guide-slide>
+            <figure><img src="assets/analytics/help/lab4-bkvision-dashboard.jpg" alt="BKVision dashboard"></figure>
+            <article>
+                <p class="guide-kicker">可视化</p>
+                <h2>行为类型分布与接口排行</h2>
+                <p>仪表盘使用饼图、柱状图和明细表展示 API 行为类型分布、接口调用排行和 JOB 操作情况。</p>
+                <ul>
+                    <li>选择单人测试也能形成图表的数据维度。</li>
+                    <li>可从最近事件继续追踪用户操作路径。</li>
+                </ul>
+            </article>
+        </section>
+        <section class="guide-slide" data-guide-slide>
+            <figure><img src="assets/analytics/help/lab4-embed.jpg" alt="Embedded BKVision dashboard"></figure>
+            <article>
+                <p class="guide-kicker">嵌入展示</p>
+                <h2>SaaS 页面嵌入 BKVision</h2>
+                <p>发布后的仪表盘通过环境变量配置到页面中，以 iframe 方式嵌入，源码中不固定平台生成的私有链接。</p>
+                <ul>
+                    <li>保留 JOB Console 和 Host Manager 入口。</li>
+                    <li>仪表盘发布后可在同一 SaaS 页面查看。</li>
+                </ul>
+            </article>
+        </section>
+        <div class="guide-footer">
+            <button class="guide-nav" type="button" id="guidePrev">Previous</button>
+            <div class="guide-dots" id="guideDots" aria-label="Guide pages"></div>
+            <button class="guide-nav primary" type="button" id="guideNext">Next</button>
+        </div>
+    </div>
+</div>
+<aside class="pet-dock" id="petDock" aria-label="Desktop pet">
+    <img class="pet-body" id="petBody" src="assets/hosts/visuals/pets/noa.png" alt="Noa" draggable="false">
+    <div class="pet-controls">
+        <select class="pet-select" id="petSelect" aria-label="Pet">
+            <option value="noa">Noa</option>
+            <option value="amane">Amane</option>
+            <option value="kurumi">Kurumi</option>
+            <option value="kaguya">Kaguya</option>
+            <option value="orie">Orie</option>
+        </select>
+        <button class="pet-reset" id="petReset" type="button" title="Reset position">R</button>
+    </div>
+</aside>
+
+<script>
+
+const apiUrl = window.FinalApp.apiUrl;
+
+function initGuideModal(storageKey) {
+    const modal = document.getElementById("guideModal");
+    if (!modal) return;
+    const slides = Array.from(modal.querySelectorAll("[data-guide-slide]"));
+    const prev = document.getElementById("guidePrev");
+    const next = document.getElementById("guideNext");
+    const dots = document.getElementById("guideDots");
+    let index = 0;
+
+    function storageGet() {
+        try { return window.localStorage.getItem(storageKey); } catch (error) { return "1"; }
+    }
+
+    function storageSet() {
+        try { window.localStorage.setItem(storageKey, "1"); } catch (error) { return; }
+    }
+
+    function render() {
+        slides.forEach((slide, slideIndex) => {
+            slide.classList.toggle("active", slideIndex === index);
+        });
+        dots.innerHTML = slides.map((_, dotIndex) => `<button type="button" class="${dotIndex === index ? "active" : ""}" data-guide-dot="${dotIndex}" aria-label="Go to page ${dotIndex + 1}"></button>`).join("");
+        prev.disabled = index === 0;
+        next.textContent = index === slides.length - 1 ? "Done" : "Next";
+    }
+
+    function openGuide(autoOpen) {
+        index = 0;
+        render();
+        modal.hidden = false;
+        document.body.classList.add("guide-open");
+        if (autoOpen) storageSet();
+    }
+
+    function closeGuide() {
+        modal.hidden = true;
+        document.body.classList.remove("guide-open");
+    }
+
+    document.querySelectorAll("[data-guide-open]").forEach((button) => {
+        button.addEventListener("click", () => openGuide(false));
+    });
+    modal.querySelectorAll("[data-guide-close]").forEach((button) => {
+        button.addEventListener("click", closeGuide);
+    });
+    prev.addEventListener("click", () => {
+        index = Math.max(0, index - 1);
+        render();
+    });
+    next.addEventListener("click", () => {
+        if (index === slides.length - 1) {
+            closeGuide();
+            return;
+        }
+        index += 1;
+        render();
+    });
+    dots.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-guide-dot]");
+        if (!button) return;
+        index = Number(button.dataset.guideDot);
+        render();
+    });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) closeGuide();
+    });
+    if (storageGet() !== "1") {
+        window.setTimeout(() => openGuide(true), 450);
+    }
+}
+
+const endpoints = {
+    summary: apiUrl("/analytics/api/summary/"),
+    config: apiUrl("/analytics/api/config/"),
+};
+
+const visualAssets = {
+    backgrounds: {
+        feather: "assets/hosts/visuals/bg/feather_sky.png",
+        lighthouse: "assets/hosts/visuals/bg/sunny_lighthouse.png",
+        clubroom: "assets/hosts/visuals/bg/clubroom.png",
+        beach: "assets/hosts/visuals/bg/beach.png",
+    },
+    pets: {
+        noa: "assets/hosts/visuals/pets/noa.png",
+        amane: "assets/hosts/visuals/pets/amane.png",
+        kurumi: "assets/hosts/visuals/pets/kurumi.png",
+        kaguya: "assets/hosts/visuals/pets/kaguya.png",
+        orie: "assets/hosts/visuals/pets/orie.png",
+    },
+};
+
+const displayState = {
+    counts: [],
+    events: [],
+    showArchivedCounts: false,
+    showArchivedEvents: false,
+    countSelectionMode: false,
+    eventSelectionMode: false,
+};
+const archiveStoragePrefix = `bkvisionDashboard:${window.location.pathname.split("/").filter(Boolean)[0] || "local"}`;
+const archivedCountKeys = loadStoredSet(`${archiveStoragePrefix}:archivedCounts`);
+const archivedEventKeys = loadStoredSet(`${archiveStoragePrefix}:archivedEvents`);
+const selectedCountKeys = new Set();
+const selectedEventKeys = new Set();
+
+function loadStoredSet(key) {
+    try {
+        const value = JSON.parse(window.localStorage.getItem(key) || "[]");
+        return new Set(Array.isArray(value) ? value : []);
+    } catch (error) {
+        return new Set();
+    }
+}
+
+function saveStoredSet(key, set) {
+    window.localStorage.setItem(key, JSON.stringify(Array.from(set)));
+}
+
+async function requestJson(url) {
+    const response = await fetch(url, { credentials: "include" });
+    const payload = await response.json();
+    if (!response.ok || !payload.result) {
+        throw new Error(payload.message || `Request failed with ${response.status}`);
+    }
+    return payload.data;
+}
+
+async function loadSummary() {
+    const data = await requestJson(endpoints.summary);
+    renderMetrics(data);
+    renderCounts(data.counts || []);
+    renderEvents(data.events || []);
+}
+
+function renderMetrics(data) {
+    const counts = data.counts || [];
+    const backupCounts = data.user_backup_counts || [];
+    const total = counts.reduce((sum, row) => sum + Number(row.request_count || 0), 0);
+    const backups = backupCounts.reduce((sum, row) => sum + Number(row.count || 0), 0);
+    document.getElementById("totalCalls").textContent = total;
+    document.getElementById("trackedApis").textContent = counts.length;
+    document.getElementById("backupActions").textContent = backups;
+}
+
+function renderCounts(rows) {
+    if (Array.isArray(rows)) {
+        displayState.counts = rows.map((row) => ({
+            ...row,
+            archive_key: row.archive_key || countArchiveKey(row),
+        }));
+    }
+    const tbody = document.getElementById("countTableBody");
+    tbody.innerHTML = "";
+    if (!displayState.counts.length) {
+        tbody.innerHTML = '<tr><td class="empty" colspan="7">No behavior data yet</td></tr>';
+        updateArchiveControls();
+        return;
+    }
+    const visibleRows = displayState.counts.filter((row) => (
+        displayState.showArchivedCounts || !archivedCountKeys.has(row.archive_key)
+    ));
+    if (!visibleRows.length) {
+        tbody.innerHTML = '<tr><td class="empty" colspan="7">All API rows are archived</td></tr>';
+        updateArchiveControls();
+        return;
+    }
+    visibleRows.forEach((row) => {
+        const tr = document.createElement("tr");
+        const archived = archivedCountKeys.has(row.archive_key);
+        const selected = selectedCountKeys.has(row.archive_key);
+        tr.className = archived ? "archived-row" : "";
+        tr.innerHTML = `
+            <td class="select-cell count-selection-column"><input type="checkbox" data-count-select="${escapeHtml(row.archive_key)}" ${selected ? "checked" : ""}></td>
+            <td>${escapeHtml(row.api_category)}</td>
+            <td>${escapeHtml(row.api_name)}</td>
+            <td>${escapeHtml(row.request_count)}</td>
+            <td>${escapeHtml(row.last_username)}</td>
+            <td>${escapeHtml(row.last_path)}</td>
+            <td>${displayState.countSelectionMode ? "" : `<button class="link-button" type="button" data-count-archive="${escapeHtml(row.archive_key)}">${archived ? "Restore" : "Archive"}</button>`}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+    updateArchiveControls();
+}
+
+function renderEvents(rows) {
+    if (Array.isArray(rows)) {
+        displayState.events = rows.map((row) => ({
+            ...row,
+            archive_key: row.archive_key || eventArchiveKey(row),
+        }));
+    }
+    const tbody = document.getElementById("eventTableBody");
+    tbody.innerHTML = "";
+    if (!displayState.events.length) {
+        tbody.innerHTML = '<tr><td class="empty" colspan="8">No events recorded yet</td></tr>';
+        updateArchiveControls();
+        return;
+    }
+    const visibleRows = displayState.events.filter((row) => (
+        displayState.showArchivedEvents || !archivedEventKeys.has(row.archive_key)
+    ));
+    if (!visibleRows.length) {
+        tbody.innerHTML = '<tr><td class="empty" colspan="8">All events are archived</td></tr>';
+        updateArchiveControls();
+        return;
+    }
+    visibleRows.forEach((row) => {
+        const tr = document.createElement("tr");
+        const archived = archivedEventKeys.has(row.archive_key);
+        const selected = selectedEventKeys.has(row.archive_key);
+        tr.className = archived ? "archived-row" : "";
+        tr.innerHTML = `
+            <td class="select-cell event-selection-column"><input type="checkbox" data-event-select="${escapeHtml(row.archive_key)}" ${selected ? "checked" : ""}></td>
+            <td>${escapeHtml(row.created_at)}</td>
+            <td>${escapeHtml(row.username)}</td>
+            <td>${escapeHtml(row.api_category)}</td>
+            <td>${escapeHtml(row.api_name)}</td>
+            <td>${escapeHtml(row.status_code)}</td>
+            <td>${escapeHtml(row.duration_ms)} ms</td>
+            <td>${displayState.eventSelectionMode ? "" : `<button class="link-button" type="button" data-event-archive="${escapeHtml(row.archive_key)}">${archived ? "Restore" : "Archive"}</button>`}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+    updateArchiveControls();
+}
+
+function countArchiveKey(row) {
+    return encodeURIComponent(JSON.stringify([row.api_category || "", row.api_name || ""]));
+}
+
+function eventArchiveKey(row) {
+    if (row.id !== undefined && row.id !== null) {
+        return String(row.id);
+    }
+    return encodeURIComponent(JSON.stringify([
+        row.created_at || "",
+        row.username || "",
+        row.api_category || "",
+        row.api_name || "",
+        row.status_code ?? "",
+        row.duration_ms ?? "",
+    ]));
+}
+
+function updateArchiveControls() {
+    const countToggle = document.getElementById("toggleArchivedCounts");
+    const countSelect = document.getElementById("selectCounts");
+    const countSelectArchived = document.getElementById("selectArchivedCounts");
+    const countSelectUnarchived = document.getElementById("selectUnarchivedCounts");
+    const countInvertSelection = document.getElementById("invertCountSelection");
+    const countArchiveSelected = document.getElementById("archiveSelectedCounts");
+    const countRestoreSelected = document.getElementById("restoreSelectedCounts");
+    const eventToggle = document.getElementById("toggleArchivedEvents");
+    const eventSelect = document.getElementById("selectEvents");
+    const eventSelectArchived = document.getElementById("selectArchivedEvents");
+    const eventSelectUnarchived = document.getElementById("selectUnarchivedEvents");
+    const eventInvertSelection = document.getElementById("invertEventSelection");
+    const eventArchiveSelected = document.getElementById("archiveSelectedEvents");
+    const eventRestoreSelected = document.getElementById("restoreSelectedEvents");
+    const selectedCounts = displayState.counts.filter((row) => selectedCountKeys.has(row.archive_key));
+    const selectedEvents = displayState.events.filter((row) => selectedEventKeys.has(row.archive_key));
+    countToggle.textContent = `${displayState.showArchivedCounts ? "Hide" : "Show"} Archived (${archivedCountKeys.size})`;
+    countSelect.textContent = displayState.countSelectionMode ? "Done" : "Select";
+    countSelectArchived.style.display = displayState.countSelectionMode ? "" : "none";
+    countSelectUnarchived.style.display = displayState.countSelectionMode ? "" : "none";
+    countInvertSelection.style.display = displayState.countSelectionMode ? "" : "none";
+    countArchiveSelected.style.display = displayState.countSelectionMode ? "" : "none";
+    countRestoreSelected.style.display = displayState.countSelectionMode ? "" : "none";
+    eventToggle.textContent = `${displayState.showArchivedEvents ? "Hide" : "Show"} Archived (${archivedEventKeys.size})`;
+    eventSelect.textContent = displayState.eventSelectionMode ? "Done" : "Select";
+    eventSelectArchived.style.display = displayState.eventSelectionMode ? "" : "none";
+    eventSelectUnarchived.style.display = displayState.eventSelectionMode ? "" : "none";
+    eventInvertSelection.style.display = displayState.eventSelectionMode ? "" : "none";
+    eventArchiveSelected.style.display = displayState.eventSelectionMode ? "" : "none";
+    eventRestoreSelected.style.display = displayState.eventSelectionMode ? "" : "none";
+    document.querySelectorAll(".count-selection-column").forEach((cell) => {
+        cell.style.display = displayState.countSelectionMode ? "" : "none";
+    });
+    document.querySelectorAll(".event-selection-column").forEach((cell) => {
+        cell.style.display = displayState.eventSelectionMode ? "" : "none";
+    });
+    countSelectArchived.disabled = !displayState.counts.some((row) => archivedCountKeys.has(row.archive_key));
+    countSelectUnarchived.disabled = !displayState.counts.some((row) => !archivedCountKeys.has(row.archive_key));
+    countInvertSelection.disabled = displayState.counts.length === 0;
+    countArchiveSelected.disabled = !selectedCounts.some((row) => !archivedCountKeys.has(row.archive_key));
+    countRestoreSelected.disabled = !selectedCounts.some((row) => archivedCountKeys.has(row.archive_key));
+    eventSelectArchived.disabled = !displayState.events.some((row) => archivedEventKeys.has(row.archive_key));
+    eventSelectUnarchived.disabled = !displayState.events.some((row) => !archivedEventKeys.has(row.archive_key));
+    eventInvertSelection.disabled = displayState.events.length === 0;
+    eventArchiveSelected.disabled = !selectedEvents.some((row) => !archivedEventKeys.has(row.archive_key));
+    eventRestoreSelected.disabled = !selectedEvents.some((row) => archivedEventKeys.has(row.archive_key));
+}
+
+function toggleCountArchive(key) {
+    if (archivedCountKeys.has(key)) {
+        archivedCountKeys.delete(key);
+    } else {
+        archivedCountKeys.add(key);
+    }
+    saveStoredSet(`${archiveStoragePrefix}:archivedCounts`, archivedCountKeys);
+    renderCounts();
+}
+
+function archiveSelectedCounts() {
+    selectedCountKeys.forEach((key) => archivedCountKeys.add(key));
+    selectedCountKeys.clear();
+    saveStoredSet(`${archiveStoragePrefix}:archivedCounts`, archivedCountKeys);
+    renderCounts();
+}
+
+function restoreSelectedCounts() {
+    selectedCountKeys.forEach((key) => archivedCountKeys.delete(key));
+    selectedCountKeys.clear();
+    saveStoredSet(`${archiveStoragePrefix}:archivedCounts`, archivedCountKeys);
+    renderCounts();
+}
+
+function selectCountsByArchiveState(archived) {
+    selectedCountKeys.clear();
+    displayState.counts.forEach((row) => {
+        if (archivedCountKeys.has(row.archive_key) === archived) {
+            selectedCountKeys.add(row.archive_key);
+        }
+    });
+    renderCounts();
+}
+
+function invertCountSelection() {
+    displayState.counts.forEach((row) => {
+        if (selectedCountKeys.has(row.archive_key)) {
+            selectedCountKeys.delete(row.archive_key);
+        } else {
+            selectedCountKeys.add(row.archive_key);
+        }
+    });
+    renderCounts();
+}
+
+function toggleEventArchive(key) {
+    if (archivedEventKeys.has(key)) {
+        archivedEventKeys.delete(key);
+    } else {
+        archivedEventKeys.add(key);
+    }
+    saveStoredSet(`${archiveStoragePrefix}:archivedEvents`, archivedEventKeys);
+    renderEvents();
+}
+
+function archiveSelectedEvents() {
+    selectedEventKeys.forEach((key) => archivedEventKeys.add(key));
+    selectedEventKeys.clear();
+    saveStoredSet(`${archiveStoragePrefix}:archivedEvents`, archivedEventKeys);
+    renderEvents();
+}
+
+function restoreSelectedEvents() {
+    selectedEventKeys.forEach((key) => archivedEventKeys.delete(key));
+    selectedEventKeys.clear();
+    saveStoredSet(`${archiveStoragePrefix}:archivedEvents`, archivedEventKeys);
+    renderEvents();
+}
+
+function selectEventsByArchiveState(archived) {
+    selectedEventKeys.clear();
+    displayState.events.forEach((row) => {
+        if (archivedEventKeys.has(row.archive_key) === archived) {
+            selectedEventKeys.add(row.archive_key);
+        }
+    });
+    renderEvents();
+}
+
+function invertEventSelection() {
+    displayState.events.forEach((row) => {
+        if (selectedEventKeys.has(row.archive_key)) {
+            selectedEventKeys.delete(row.archive_key);
+        } else {
+            selectedEventKeys.add(row.archive_key);
+        }
+    });
+    renderEvents();
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function applyBackground(name) {
+    const selected = visualAssets.backgrounds[name] ? name : "feather";
+    document.documentElement.style.setProperty("--page-bg", `url("${visualAssets.backgrounds[selected]}")`);
+    document.querySelectorAll("#backgroundTools button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.bg === selected);
+    });
+    window.localStorage.setItem("bkvisionDashboardBackground", selected);
+}
+
+function initBackgroundTools() {
+    const stored = window.localStorage.getItem("bkvisionDashboardBackground") || "feather";
+    applyBackground(stored);
+    document.getElementById("backgroundTools").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-bg]");
+        if (button) {
+            applyBackground(button.dataset.bg);
+        }
+    });
+}
+
+function initPet() {
+    const dock = document.getElementById("petDock");
+    const body = document.getElementById("petBody");
+    const select = document.getElementById("petSelect");
+    const reset = document.getElementById("petReset");
+    const savedPet = window.localStorage.getItem("bkvisionDashboardPet") || "noa";
+    const state = {
+        x: 0,
+        y: 0,
+        velocityY: 0,
+        dragging: false,
+        dragOffsetX: 0,
+        dragOffsetY: 0,
+        lastTime: performance.now(),
+    };
+
+    function size() {
+        return {
+            width: dock.offsetWidth || 168,
+            height: dock.offsetHeight || 220,
+        };
+    }
+
+    function floorY() {
+        return Math.max(12, window.innerHeight - size().height - 18);
+    }
+
+    function clampPosition() {
+        const box = size();
+        state.x = Math.min(Math.max(10, state.x), Math.max(10, window.innerWidth - box.width - 10));
+        state.y = Math.min(Math.max(10, state.y), floorY());
+    }
+
+    function resetPosition() {
+        const box = size();
+        state.x = Math.max(10, window.innerWidth - box.width - 28);
+        state.y = floorY();
+        state.velocityY = 0;
+        render(performance.now());
+    }
+
+    function setPet(name) {
+        const selected = visualAssets.pets[name] ? name : "noa";
+        body.src = visualAssets.pets[selected];
+        body.alt = selected.charAt(0).toUpperCase() + selected.slice(1);
+        select.value = selected;
+        window.localStorage.setItem("bkvisionDashboardPet", selected);
+    }
+
+    function render(time) {
+        const bob = state.dragging ? 0 : Math.sin(time / 640) * 4;
+        const sway = state.dragging ? 0 : Math.sin(time / 1200) * 3;
+        dock.style.transform = `translate3d(${state.x + sway}px, ${state.y + bob}px, 0)`;
+    }
+
+    function animate(time) {
+        const delta = Math.min(32, time - state.lastTime);
+        state.lastTime = time;
+        if (!state.dragging) {
+            const floor = floorY();
+            if (state.y < floor || state.velocityY > 0.01) {
+                state.velocityY += 0.0024 * delta;
+                state.y += state.velocityY * delta;
+                if (state.y > floor) {
+                    state.y = floor;
+                    state.velocityY = 0;
+                }
+            }
+            clampPosition();
+        }
+        render(time);
+        window.requestAnimationFrame(animate);
+    }
+
+    body.addEventListener("dragstart", (event) => event.preventDefault());
+    body.addEventListener("pointerdown", (event) => {
+        if (!event.isPrimary) return;
+        event.preventDefault();
+        state.dragging = true;
+        state.velocityY = 0;
+        state.dragOffsetX = event.clientX - state.x;
+        state.dragOffsetY = event.clientY - state.y;
+        body.setPointerCapture(event.pointerId);
+    });
+    body.addEventListener("pointermove", (event) => {
+        if (!state.dragging) return;
+        state.x = event.clientX - state.dragOffsetX;
+        state.y = event.clientY - state.dragOffsetY;
+        clampPosition();
+        render(performance.now());
+    });
+    body.addEventListener("pointerup", (event) => {
+        state.dragging = false;
+        state.velocityY = 0;
+        body.releasePointerCapture(event.pointerId);
+    });
+    body.addEventListener("pointercancel", () => {
+        state.dragging = false;
+    });
+
+    select.addEventListener("change", () => setPet(select.value));
+    reset.addEventListener("click", resetPosition);
+    document.addEventListener("keydown", (event) => {
+        if (event.key.toLowerCase() === "r" && !event.ctrlKey && !event.altKey && !event.metaKey) {
+            const tagName = document.activeElement ? document.activeElement.tagName : "";
+            if (!["INPUT", "SELECT", "TEXTAREA"].includes(tagName)) {
+                resetPosition();
+            }
+        }
+    });
+    window.addEventListener("resize", resetPosition);
+    setPet(savedPet);
+    window.setTimeout(resetPosition, 50);
+    window.requestAnimationFrame(animate);
+}
+
+function renderBkvisionEmbed(url) {
+    const wrap = document.getElementById("bkvisionFrameWrap");
+    if (!wrap) return;
+    const safeUrl = String(url || "").trim();
+    if (!safeUrl) {
+        wrap.innerHTML = '<div class="empty" id="bkvisionEmpty">Configure BKVision dashboard URL from Backend settings or platform variables.</div>';
+        return;
+    }
+    const iframe = document.createElement("iframe");
+    iframe.src = safeUrl.replace(/^http:\/\//, "https://");
+    iframe.title = "BKVision Dashboard";
+    wrap.innerHTML = "";
+    wrap.appendChild(iframe);
+}
+
+async function loadBkvisionConfig() {
+    let dashboardUrl = window.FinalApp.getBkvisionUrl();
+    if (!dashboardUrl) {
+        try {
+            const data = await requestJson(endpoints.config);
+            dashboardUrl = data.bkvision_dashboard_url || "";
+        } catch (error) {
+            dashboardUrl = "";
+        }
+    }
+    renderBkvisionEmbed(dashboardUrl);
+}
+document.getElementById("refreshBtn").addEventListener("click", loadSummary);
+document.getElementById("toggleArchivedCounts").addEventListener("click", () => {
+    displayState.showArchivedCounts = !displayState.showArchivedCounts;
+    renderCounts();
+});
+document.getElementById("selectCounts").addEventListener("click", () => {
+    displayState.countSelectionMode = !displayState.countSelectionMode;
+    if (!displayState.countSelectionMode) {
+        selectedCountKeys.clear();
+    }
+    renderCounts();
+});
+document.getElementById("selectArchivedCounts").addEventListener("click", () => selectCountsByArchiveState(true));
+document.getElementById("selectUnarchivedCounts").addEventListener("click", () => selectCountsByArchiveState(false));
+document.getElementById("invertCountSelection").addEventListener("click", invertCountSelection);
+document.getElementById("archiveSelectedCounts").addEventListener("click", archiveSelectedCounts);
+document.getElementById("restoreSelectedCounts").addEventListener("click", restoreSelectedCounts);
+document.getElementById("toggleArchivedEvents").addEventListener("click", () => {
+    displayState.showArchivedEvents = !displayState.showArchivedEvents;
+    renderEvents();
+});
+document.getElementById("selectEvents").addEventListener("click", () => {
+    displayState.eventSelectionMode = !displayState.eventSelectionMode;
+    if (!displayState.eventSelectionMode) {
+        selectedEventKeys.clear();
+    }
+    renderEvents();
+});
+document.getElementById("selectArchivedEvents").addEventListener("click", () => selectEventsByArchiveState(true));
+document.getElementById("selectUnarchivedEvents").addEventListener("click", () => selectEventsByArchiveState(false));
+document.getElementById("invertEventSelection").addEventListener("click", invertEventSelection);
+document.getElementById("archiveSelectedEvents").addEventListener("click", archiveSelectedEvents);
+document.getElementById("restoreSelectedEvents").addEventListener("click", restoreSelectedEvents);
+document.getElementById("countTableBody").addEventListener("change", (event) => {
+    const input = event.target.closest("input[data-count-select]");
+    if (!input) {
+        return;
+    }
+    if (input.checked) {
+        selectedCountKeys.add(input.dataset.countSelect);
+    } else {
+        selectedCountKeys.delete(input.dataset.countSelect);
+    }
+    updateArchiveControls();
+});
+document.getElementById("countTableBody").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-count-archive]");
+    if (button) {
+        toggleCountArchive(button.dataset.countArchive);
+    }
+});
+document.getElementById("eventTableBody").addEventListener("change", (event) => {
+    const input = event.target.closest("input[data-event-select]");
+    if (!input) {
+        return;
+    }
+    if (input.checked) {
+        selectedEventKeys.add(input.dataset.eventSelect);
+    } else {
+        selectedEventKeys.delete(input.dataset.eventSelect);
+    }
+    updateArchiveControls();
+});
+document.getElementById("eventTableBody").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-event-archive]");
+    if (button) {
+        toggleEventArchive(button.dataset.eventArchive);
+    }
+});
+initBackgroundTools();
+initPet();
+loadSummary();
+initGuideModal("bkvision-dashboard.guide.seen.v1");
+</script>
+</body>
+</html>
+

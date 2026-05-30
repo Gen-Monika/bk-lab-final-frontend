@@ -1,0 +1,1994 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="%APP_BASE%">
+    %APP_CONFIG_SCRIPT%
+    <script src="assets/js/runtime.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JOB Log Backup Console</title>
+    <style>
+        :root {
+            --page-bg: url("assets/hosts/visuals/bg/sunny_lighthouse.png");
+            --bg: #eef3f8;
+            --panel: #ffffff;
+            --ink: #1d2738;
+            --muted: #667085;
+            --line: #dce4ef;
+            --accent: #2268f5;
+            --accent-soft: #edf4ff;
+            --success: #16845b;
+            --danger: #ba2f3b;
+            --shadow: 0 14px 36px rgba(32, 44, 72, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: var(--ink);
+            font: 14px/1.5 Arial, "Microsoft YaHei", sans-serif;
+            background:
+                linear-gradient(180deg, rgba(239, 246, 255, 0.58), rgba(243, 246, 249, 0.76)),
+                var(--page-bg) center / cover fixed no-repeat;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.58;
+        }
+
+        .shell {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 22px;
+        }
+
+        .topbar,
+        .panel {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(220, 228, 239, 0.95);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(4px);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 16px;
+            padding: 14px 18px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #2268f5, #10a37f);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
+        .brand p {
+            margin: 2px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .status {
+            color: var(--muted);
+            min-height: 20px;
+        }
+
+        .status.error {
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        .segmented {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            background: rgba(237, 244, 255, 0.9);
+            border: 1px solid rgba(204, 216, 236, 0.95);
+            border-radius: 8px;
+        }
+
+        .segmented button {
+            min-width: 84px;
+            height: 30px;
+            padding: 0 9px;
+            color: #445066;
+            background: transparent;
+            border: 0;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .segmented button.active {
+            color: #17345f;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(37, 52, 82, 0.12);
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            padding: 0 12px;
+            color: #245fc7;
+            background: #fff;
+            border: 1px solid #b9cae8;
+            border-radius: 6px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 360px minmax(0, 1fr);
+            gap: 16px;
+            align-items: start;
+        }
+
+        .panel {
+            padding: 16px;
+        }
+
+        .panel h2 {
+            margin: 0 0 12px;
+            font-size: 16px;
+        }
+
+        .panel-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .panel-title-row h2 {
+            margin: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 6px;
+            color: #4d596b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            height: 36px;
+            padding: 0 10px;
+            color: var(--ink);
+            background: #fff;
+            border: 1px solid #cbd6e4;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #72a2ff;
+            box-shadow: 0 0 0 3px rgba(34, 104, 245, 0.12);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .compact-actions {
+            margin-top: 0;
+            gap: 8px;
+        }
+
+        .btn-primary,
+        .btn-ghost,
+        .btn-link {
+            height: 34px;
+            padding: 0 12px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .btn-primary:disabled {
+            background: #9bb8f2;
+            border-color: #9bb8f2;
+            cursor: wait;
+        }
+
+        .btn-ghost {
+            color: #245fc7;
+            background: #fff;
+            border-color: #b9cae8;
+        }
+
+        .btn-link {
+            height: 28px;
+            color: #245fc7;
+            background: var(--accent-soft);
+            border-color: #cfddf8;
+        }
+
+        .btn-ghost:disabled,
+        .btn-link:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .host-list {
+            display: grid;
+            gap: 8px;
+            max-height: 250px;
+            overflow: auto;
+            padding: 4px;
+            border: 1px solid #e1e8f2;
+            border-radius: 6px;
+            background: #f8fbff;
+        }
+
+        .host-row {
+            display: grid;
+            grid-template-columns: 20px 1fr;
+            gap: 8px;
+            align-items: center;
+            padding: 7px;
+            background: #fff;
+            border: 1px solid #ebf0f6;
+            border-radius: 6px;
+        }
+
+        .host-row strong,
+        .host-row span {
+            display: block;
+            overflow-wrap: anywhere;
+        }
+
+        .host-row span {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .two-cols {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 640px;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        tr.archived-record td {
+            background: #fff8e6;
+        }
+
+        th,
+        td {
+            padding: 10px 9px;
+            border-bottom: 1px solid #edf1f7;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            color: #526071;
+            background: #f7f9fd;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        td {
+            color: #243044;
+        }
+
+        .empty {
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 0 8px;
+            border-radius: 999px;
+            color: #4b5a6d;
+            background: #eef2f7;
+            font-size: 12px;
+        }
+
+        .badge.success {
+            color: var(--success);
+            background: #e7f7f0;
+        }
+
+        .badge.error {
+            color: var(--danger);
+            background: #fdecef;
+        }
+
+        .results {
+            display: grid;
+            gap: 10px;
+            max-height: 460px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .result-card {
+            padding: 10px;
+            background: #f8fbff;
+            border: 1px solid #e1e8f2;
+            border-radius: 6px;
+        }
+
+        .result-card.archived {
+            background: #fff8e6;
+            border-color: #f3d18c;
+        }
+
+        .result-card-header,
+        .row-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .result-card-header {
+            justify-content: space-between;
+        }
+
+        .selectable-heading {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .select-cell {
+            width: 34px;
+            text-align: center;
+        }
+
+        .result-card strong,
+        .result-card span {
+            display: block;
+        }
+
+        .result-card span {
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        .pet-dock {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 168px;
+            z-index: 30;
+            user-select: none;
+            touch-action: none;
+            will-change: transform;
+        }
+
+        .pet-body {
+            display: block;
+            width: 100%;
+            height: 172px;
+            object-fit: contain;
+            object-position: bottom center;
+            cursor: grab;
+            filter: drop-shadow(0 14px 18px rgba(24, 32, 51, 0.22));
+            -webkit-user-drag: none;
+            user-drag: none;
+        }
+
+        .pet-body:active {
+            cursor: grabbing;
+        }
+
+        .pet-controls {
+            display: grid;
+            grid-template-columns: 1fr 34px;
+            gap: 6px;
+            align-items: center;
+            margin-top: 4px;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.88);
+            border: 1px solid rgba(214, 222, 235, 0.96);
+            border-radius: 8px;
+            box-shadow: 0 8px 18px rgba(32, 44, 72, 0.12);
+            backdrop-filter: blur(8px);
+        }
+
+        .pet-select {
+            width: 100%;
+            height: 30px;
+            padding: 0 6px;
+            color: var(--ink);
+            background: #fff;
+            border: 1px solid #cbd6e4;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .pet-reset {
+            width: 30px;
+            height: 30px;
+            color: #42526a;
+            background: #f5f8fc;
+            border: 1px solid #d9e1ec;
+            border-radius: 6px;
+        }
+
+        body.guide-open {
+            overflow: hidden;
+        }
+
+        .guide-help-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            padding: 0 12px;
+            color: #245fc7;
+            background: #fff;
+            border: 1px solid #b9cae8;
+            border-radius: 6px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .guide-help-button:hover {
+            color: #fff;
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .guide-modal[hidden] {
+            display: none !important;
+        }
+
+        .guide-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .guide-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(6px);
+        }
+
+        .guide-dialog {
+            position: relative;
+            width: min(1000px, 100%);
+            max-height: min(780px, calc(100vh - 48px));
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid rgba(220, 228, 239, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 30px 84px rgba(15, 23, 42, 0.3);
+        }
+
+        .guide-close {
+            position: absolute;
+            right: 14px;
+            top: 10px;
+            z-index: 1;
+            width: 32px;
+            height: 32px;
+            color: #526071;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        .guide-slide {
+            display: none;
+            grid-template-columns: minmax(0, 1.18fr) minmax(290px, 0.82fr);
+            gap: 24px;
+            padding: 28px;
+        }
+
+        .guide-slide.active {
+            display: grid;
+        }
+
+        .guide-slide figure {
+            margin: 0;
+            overflow: hidden;
+            background: #f4f7fb;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .guide-slide img {
+            display: block;
+            width: 100%;
+            height: 360px;
+            object-fit: contain;
+            object-position: center;
+        }
+
+        .guide-slide article {
+            align-self: center;
+        }
+
+        .guide-kicker {
+            margin: 0 0 8px;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .guide-slide h2 {
+            margin: 0 0 12px;
+            color: var(--ink);
+            font-size: 26px;
+            line-height: 1.16;
+        }
+
+        .guide-slide p,
+        .guide-slide li {
+            color: var(--muted);
+            line-height: 1.72;
+        }
+
+        .guide-slide ul {
+            margin: 12px 0 0;
+            padding-left: 18px;
+        }
+
+        .guide-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 20px;
+            background: #f8fafc;
+            border-top: 1px solid var(--line);
+        }
+
+        .guide-nav {
+            min-width: 96px;
+            height: 34px;
+            padding: 0 12px;
+            color: #245fc7;
+            background: #fff;
+            border: 1px solid #b9cae8;
+            border-radius: 6px;
+        }
+
+        .guide-nav.primary {
+            color: #fff;
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .guide-nav:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .guide-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .guide-dots button {
+            width: 10px;
+            height: 10px;
+            padding: 0;
+            background: #c3cfdf;
+            border: 0;
+            border-radius: 999px;
+        }
+
+        .guide-dots button.active {
+            width: 22px;
+            background: var(--accent);
+        }
+
+        @media (max-width: 980px) {
+            .grid,
+            .two-cols {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .topbar-right {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                padding: 14px;
+            }
+
+            .segmented {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .segmented button {
+                min-width: 80px;
+            }
+
+            .pet-dock {
+                width: 138px;
+            }
+
+            .pet-body {
+                height: 144px;
+            }
+
+            .guide-dialog {
+                max-height: calc(100vh - 28px);
+                overflow-y: auto;
+            }
+
+            .guide-slide,
+            .guide-slide.active {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .guide-slide img {
+                height: 260px;
+            }
+
+            .guide-slide h2 {
+                font-size: 22px;
+            }
+
+            .guide-footer {
+                position: sticky;
+                bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">JOB</div>
+            <div>
+                <h1>JOB Log Backup Console</h1>
+                <p>BlueKing job plan execution and game host log backup</p>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <a class="nav-btn" href="./">Back to Analytics</a><button class="nav-btn" type="button" data-backend-settings>Backend</button>
+            <div class="segmented" id="backgroundTools" aria-label="Background">
+                <button class="active" type="button" data-bg="lighthouse">Lighthouse</button>
+                <button type="button" data-bg="feather">Feather sky</button>
+                <button type="button" data-bg="clubroom">Clubroom</button>
+                <button type="button" data-bg="beach">Beach</button>
+            </div>
+            <button class="guide-help-button" type="button" data-guide-open>Help</button>
+            <div class="status" id="statusText"></div>
+        </div>
+    </header>
+
+    <main class="grid">
+        <section class="panel">
+            <h2>Host Scope</h2>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="bizSelect">Business</label>
+                    <select id="bizSelect"></select>
+                </div>
+                <div class="field">
+                    <label for="hostNameInput">Host name</label>
+                    <input id="hostNameInput" type="text" placeholder="optional">
+                </div>
+                <div class="field">
+                    <label for="operatorInput">Operator</label>
+                    <input id="operatorInput" type="text" placeholder="optional">
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn-primary" id="loadHostsBtn" type="button">Load Hosts</button>
+                <button class="btn-ghost" id="reloadPlansBtn" type="button">Load Plans</button>
+            </div>
+            <div class="host-list" id="hostList" style="margin-top: 12px;"></div>
+        </section>
+
+        <div class="form-grid">
+            <section class="panel">
+                <h2>Job Plans</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Plan ID</th>
+                                <th>Name</th>
+                                <th>Creator</th>
+                                <th>Updated</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="planTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="two-cols">
+                <div class="panel">
+                    <h2>Search Logs</h2>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="searchPlanSelect">Search plan</label>
+                            <select id="searchPlanSelect"></select>
+                        </div>
+                        <div class="field">
+                            <label for="searchPathInput">Search path</label>
+                            <input id="searchPathInput" type="text" value="/project">
+                        </div>
+                        <div class="field">
+                            <label for="suffixInput">File suffix</label>
+                            <input id="suffixInput" type="text" value="log">
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-primary" id="searchFilesBtn" type="button">Search Files</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Backup Logs</h2>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="backupPlanSelect">Backup plan</label>
+                            <select id="backupPlanSelect"></select>
+                        </div>
+                        <div class="field">
+                            <label for="backupPathInput">Backup path</label>
+                            <input id="backupPathInput" type="text" value="/project/backup">
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-primary" id="backupFilesBtn" type="button">Backup Selected</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-title-row">
+                    <h2>File Results</h2>
+                    <div class="actions compact-actions">
+                        <button class="btn-ghost" id="toggleFileArchiveBtn" type="button">Show Archived</button>
+                        <button class="btn-ghost" id="selectFileResultsBtn" type="button">Select</button>
+                        <button class="btn-link" id="selectArchivedFileResultsBtn" type="button">Select Archived</button>
+                        <button class="btn-link" id="selectUnarchivedFileResultsBtn" type="button">Select Unarchived</button>
+                        <button class="btn-link" id="invertFileResultSelectionBtn" type="button">Invert Selection</button>
+                        <button class="btn-link" id="archiveSelectedFileResultsBtn" type="button">Archive Selected</button>
+                        <button class="btn-link" id="restoreSelectedFileResultsBtn" type="button">Restore Selected</button>
+                    </div>
+                </div>
+                <div class="results" id="fileResults"></div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-title-row">
+                    <h2>Execution Records</h2>
+                    <div class="actions compact-actions">
+                        <button class="btn-ghost" id="toggleRecordArchiveBtn" type="button">Show Archived</button>
+                        <button class="btn-ghost" id="selectRecordsBtn" type="button">Select</button>
+                        <button class="btn-link" id="selectArchivedRecordsBtn" type="button">Select Archived</button>
+                        <button class="btn-link" id="selectUnarchivedRecordsBtn" type="button">Select Unarchived</button>
+                        <button class="btn-link" id="invertRecordSelectionBtn" type="button">Invert Selection</button>
+                        <button class="btn-link" id="archiveSelectedRecordsBtn" type="button">Archive Selected</button>
+                        <button class="btn-link" id="restoreSelectedRecordsBtn" type="button">Restore Selected</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="select-cell record-selection-column">Select</th>
+                                <th>Time</th>
+                                <th>Action</th>
+                                <th>Instance</th>
+                                <th>Status</th>
+                                <th>Hosts</th>
+                                <th>Summary</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<div class="guide-modal" id="guideModal" aria-modal="true" role="dialog" aria-labelledby="guideTitle" hidden>
+    <div class="guide-backdrop" data-guide-close></div>
+    <div class="guide-dialog">
+        <button class="guide-close" type="button" data-guide-close aria-label="Close">×</button>
+        <section class="guide-slide active" data-guide-slide>
+            <figure><img src="assets/jobs/help/lab4-job-console.jpg" alt="JOB console"></figure>
+            <article>
+                <p class="guide-kicker">Lab 3 · JOB</p>
+                <h2 id="guideTitle">作业平台控制台</h2>
+                <p>JOB 页面负责主机范围、计划选择、文件查询和日志备份，统一承接实验中的执行入口。</p>
+                <ul>
+                    <li>顶部保留返回 BKVision 的入口。</li>
+                    <li>背景和桌宠设置会按浏览器保存。</li>
+                </ul>
+            </article>
+        </section>
+        <section class="guide-slide" data-guide-slide>
+            <figure><img src="assets/jobs/help/lab4-job-records.jpg" alt="Waiting execution records"></figure>
+            <article>
+                <p class="guide-kicker">执行记录</p>
+                <h2>查询申请与执行状态</h2>
+                <p>执行记录先展示 waiting、approved 和 platform status 等状态，再由刷新逻辑补全最终结果。</p>
+                <ul>
+                    <li>未确认任务保持可见，便于核验流程。</li>
+                    <li>刷新后会回填最新状态与摘要。</li>
+                </ul>
+            </article>
+        </section>
+        <section class="guide-slide" data-guide-slide>
+            <figure><img src="assets/jobs/help/lab4-job-pass.jpg" alt="Approved execution"></figure>
+            <article>
+                <p class="guide-kicker">平台通过</p>
+                <h2>作业平台执行链路</h2>
+                <p>查询或备份指令提交后，JOB 平台通过时会进入可追踪的执行链路，便于后续刷新结果。</p>
+                <ul>
+                    <li>保留单条记录操作。</li>
+                    <li>结构化结果可回填文件计数和大小信息。</li>
+                </ul>
+            </article>
+        </section>
+        <section class="guide-slide" data-guide-slide>
+            <figure><img src="assets/jobs/help/lab4-job-result.jpg" alt="Structured file result"></figure>
+            <article>
+                <p class="guide-kicker">结果展示</p>
+                <h2>文件查询与备份结果</h2>
+                <p>File Results 会把 search / backup 的结果按卡片呈现，超过三条也不会在刷新后丢失。</p>
+                <ul>
+                    <li>归档项和普通项用不同背景区分。</li>
+                    <li>结果行保留标题、摘要和状态信息。</li>
+                </ul>
+            </article>
+        </section>
+        <section class="guide-slide" data-guide-slide>
+            <figure><img src="assets/jobs/help/lab4-job-archive.jpg" alt="Archive controls"></figure>
+            <article>
+                <p class="guide-kicker">整理归档</p>
+                <h2>批量归档与恢复</h2>
+                <p>执行记录和文件结果都支持选择、反选、按归档状态批量整理，让页面保持可读。</p>
+                <ul>
+                    <li>默认保留单条操作。</li>
+                    <li>进入选择模式后可批量处理多条条目。</li>
+                </ul>
+            </article>
+        </section>
+        <div class="guide-footer">
+            <button class="guide-nav" type="button" id="guidePrev">Previous</button>
+            <div class="guide-dots" id="guideDots" aria-label="Guide pages"></div>
+            <button class="guide-nav primary" type="button" id="guideNext">Next</button>
+        </div>
+    </div>
+</div>
+
+<aside class="pet-dock" id="petDock" aria-label="Desktop pet">
+    <img class="pet-body" id="petBody" src="assets/hosts/visuals/pets/noa.png" alt="Noa" draggable="false">
+    <div class="pet-controls">
+        <select class="pet-select" id="petSelect" aria-label="Pet">
+            <option value="noa">Noa</option>
+            <option value="amane">Amane</option>
+            <option value="kurumi">Kurumi</option>
+            <option value="kaguya">Kaguya</option>
+            <option value="orie">Orie</option>
+        </select>
+        <button class="pet-reset" id="petReset" type="button" title="Reset position">R</button>
+    </div>
+</aside>
+
+<script>
+const apiUrl = window.FinalApp.apiUrl;
+const endpoints = {
+    businesses: apiUrl("/jobs/api/businesses/"),
+    hosts: apiUrl("/jobs/api/hosts/"),
+    plans: apiUrl("/jobs/api/plans/"),
+    searchFiles: apiUrl("/jobs/api/search-files/"),
+    backupFiles: apiUrl("/jobs/api/backup-files/"),
+    records: apiUrl("/jobs/api/records/"),
+};
+
+const visualAssets = {
+    backgrounds: {
+        lighthouse: "assets/hosts/visuals/bg/sunny_lighthouse.png",
+        feather: "assets/hosts/visuals/bg/feather_sky.png",
+        clubroom: "assets/hosts/visuals/bg/clubroom.png",
+        beach: "assets/hosts/visuals/bg/beach.png",
+    },
+    pets: {
+        noa: "assets/hosts/visuals/pets/noa.png",
+        amane: "assets/hosts/visuals/pets/amane.png",
+        kurumi: "assets/hosts/visuals/pets/kurumi.png",
+        kaguya: "assets/hosts/visuals/pets/kaguya.png",
+        orie: "assets/hosts/visuals/pets/orie.png",
+    },
+};
+
+const state = {
+    businesses: [],
+    hosts: [],
+    plans: [],
+    records: [],
+    fileResults: [],
+    showArchivedFileResults: false,
+    showArchivedRecords: false,
+    fileSelectionMode: false,
+    recordSelectionMode: false,
+};
+
+const ACTIVE_STATUS_CODES = new Set([1, 2, 7, 8, 9, 10, 12]);
+const TERMINAL_STATUS_CODES = new Set([3, 4, 5, 6, 11, 13]);
+const ACTIVE_STATUS_TEXTS = new Set([
+    "not started",
+    "running",
+    "waiting",
+    "forced",
+    "state abnormal",
+    "stopping",
+    "queueing",
+]);
+const RECORD_REFRESH_INTERVAL_MS = 8000;
+let recordRefreshTimer = null;
+let recordsRefreshing = false;
+const archiveStoragePrefix = `jobConsole:${window.location.pathname.split("/").filter(Boolean)[0] || "local"}`;
+const archivedFileResultKeys = loadStoredSet(`${archiveStoragePrefix}:archivedFileResults`);
+const archivedRecordIds = loadStoredSet(`${archiveStoragePrefix}:archivedRecords`);
+const selectedFileResultKeys = new Set();
+const selectedRecordIds = new Set();
+
+function setStatus(message, tone) {
+    const el = document.getElementById("statusText");
+    el.textContent = message || "";
+    el.className = tone === "error" ? "status error" : "status";
+}
+
+function setBusy(id, busy) {
+    document.getElementById(id).disabled = busy;
+}
+
+function loadStoredSet(key) {
+    try {
+        const value = JSON.parse(window.localStorage.getItem(key) || "[]");
+        return new Set(Array.isArray(value) ? value.map(String) : []);
+    } catch (error) {
+        return new Set();
+    }
+}
+
+function saveStoredSet(key, set) {
+    window.localStorage.setItem(key, JSON.stringify(Array.from(set)));
+}
+
+function csrfToken() {
+    const match = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : "";
+}
+
+async function requestJson(url, options = {}) {
+    const response = await fetch(url, {
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken(),
+            ...(options.headers || {}),
+        },
+        ...options,
+    });
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+        throw new Error(`Unexpected response ${response.status}`);
+    }
+    const payload = await response.json();
+    if (!response.ok || !payload.result) {
+        throw new Error(payload.message || `Request failed with ${response.status}`);
+    }
+    return payload.data;
+}
+
+function fillSelect(id, rows, valueKey, textKey, placeholder) {
+    const select = document.getElementById(id);
+    select.innerHTML = "";
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = placeholder;
+    select.appendChild(option);
+    rows.forEach((row) => {
+        const item = document.createElement("option");
+        item.value = row[valueKey];
+        item.textContent = row[textKey];
+        select.appendChild(item);
+    });
+}
+
+async function loadBusinesses() {
+    try {
+        setStatus("Loading businesses...");
+        state.businesses = await requestJson(endpoints.businesses);
+        fillSelect("bizSelect", state.businesses, "bk_biz_id", "bk_biz_name", "Select business");
+        setStatus("");
+    } catch (error) {
+        setStatus(error.message, "error");
+    }
+}
+
+async function loadHosts() {
+    const bizId = document.getElementById("bizSelect").value;
+    if (!bizId) {
+        setStatus("Select a business first");
+        return;
+    }
+    const params = new URLSearchParams({ bk_biz_id: bizId });
+    const hostName = document.getElementById("hostNameInput").value.trim();
+    const operator = document.getElementById("operatorInput").value.trim();
+    if (hostName) params.set("bk_host_name", hostName);
+    if (operator) params.set("operator", operator);
+    setBusy("loadHostsBtn", true);
+    try {
+        setStatus("Loading hosts...");
+        state.hosts = await requestJson(`${endpoints.hosts}?${params.toString()}`);
+        renderHosts();
+        setStatus(`${state.hosts.length} hosts loaded`);
+    } catch (error) {
+        state.hosts = [];
+        renderHosts();
+        setStatus(error.message, "error");
+    } finally {
+        setBusy("loadHostsBtn", false);
+    }
+}
+
+function renderHosts() {
+    const box = document.getElementById("hostList");
+    box.innerHTML = "";
+    if (!state.hosts.length) {
+        box.innerHTML = '<div class="empty">No hosts loaded</div>';
+        return;
+    }
+    state.hosts.forEach((host) => {
+        const label = document.createElement("label");
+        label.className = "host-row";
+        label.innerHTML = `
+            <input type="checkbox" value="${escapeHtml(host.bk_host_id || "")}">
+            <span>
+                <strong>${escapeHtml(host.bk_host_name || host.bk_host_innerip || "Unnamed host")}</strong>
+                <span>${escapeHtml(host.bk_host_innerip || "")} / ${escapeHtml(host.operator || "")}</span>
+            </span>
+        `;
+        box.appendChild(label);
+    });
+}
+
+async function loadPlans() {
+    const bizId = document.getElementById("bizSelect").value;
+    if (!bizId) {
+        setStatus("Select a business first");
+        return;
+    }
+    setBusy("reloadPlansBtn", true);
+    try {
+        setStatus("Loading job plans...");
+        state.plans = await requestJson(`${endpoints.plans}?bk_biz_id=${encodeURIComponent(bizId)}`);
+        renderPlans();
+        fillPlanSelects();
+        setStatus(`${state.plans.length} plans loaded`);
+    } catch (error) {
+        state.plans = [];
+        renderPlans();
+        fillPlanSelects();
+        setStatus(error.message, "error");
+    } finally {
+        setBusy("reloadPlansBtn", false);
+    }
+}
+
+function renderPlans() {
+    const tbody = document.getElementById("planTableBody");
+    tbody.innerHTML = "";
+    if (!state.plans.length) {
+        tbody.innerHTML = '<tr><td class="empty" colspan="5">No plans loaded</td></tr>';
+        return;
+    }
+    state.plans.forEach((plan) => {
+        const row = document.createElement("tr");
+        const id = plan.id || plan.job_plan_id;
+        row.innerHTML = `
+            <td>${escapeHtml(id || "")}</td>
+            <td>${escapeHtml(plan.name || plan.job_plan_name || "")}</td>
+            <td>${escapeHtml(plan.creator || plan.create_user || "")}</td>
+            <td>${escapeHtml(plan.update_time || plan.create_time || "")}</td>
+            <td><button class="btn-link" type="button" data-plan="${escapeHtml(id || "")}">Use</button></td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function fillPlanSelects() {
+    const rows = state.plans.map((plan) => ({
+        id: plan.id || plan.job_plan_id,
+        name: `${plan.id || plan.job_plan_id} / ${plan.name || plan.job_plan_name || "Unnamed plan"}`,
+    }));
+    fillSelect("searchPlanSelect", rows, "id", "name", "Select search plan");
+    fillSelect("backupPlanSelect", rows, "id", "name", "Select backup plan");
+}
+
+function selectedHosts() {
+    return Array.from(document.querySelectorAll("#hostList input:checked"))
+        .map((input) => Number(input.value))
+        .filter(Boolean);
+}
+
+function executionPayload(planSelectId) {
+    const bkBizId = Number(document.getElementById("bizSelect").value);
+    const jobPlanId = Number(document.getElementById(planSelectId).value);
+    const hostIds = selectedHosts();
+    if (!bkBizId) throw new Error("Select a business first");
+    if (!jobPlanId) throw new Error("Select a job plan first");
+    if (!hostIds.length) throw new Error("Select at least one host");
+    return { bk_biz_id: bkBizId, job_plan_id: jobPlanId, host_ids: hostIds };
+}
+
+async function searchFiles() {
+    setBusy("searchFilesBtn", true);
+    try {
+        const payload = {
+            ...executionPayload("searchPlanSelect"),
+            search_path: document.getElementById("searchPathInput").value.trim(),
+            suffix: document.getElementById("suffixInput").value.trim(),
+        };
+        setStatus("Executing search plan...");
+        const data = await requestJson(endpoints.searchFiles, {
+            method: "POST",
+            body: JSON.stringify(payload),
+        });
+        renderFileResults(withRecordContext(data.logs || [], data.record));
+        await loadRecords();
+        setStatus("Search execution submitted");
+    } catch (error) {
+        setStatus(error.message, "error");
+    } finally {
+        setBusy("searchFilesBtn", false);
+    }
+}
+
+async function backupFiles() {
+    setBusy("backupFilesBtn", true);
+    try {
+        const payload = {
+            ...executionPayload("backupPlanSelect"),
+            search_path: document.getElementById("searchPathInput").value.trim(),
+            suffix: document.getElementById("suffixInput").value.trim(),
+            backup_path: document.getElementById("backupPathInput").value.trim(),
+        };
+        setStatus("Executing backup plan...");
+        const data = await requestJson(endpoints.backupFiles, {
+            method: "POST",
+            body: JSON.stringify(payload),
+        });
+        renderFileResults(withRecordContext(data.logs || [], data.record));
+        await loadRecords();
+        setStatus("Backup execution submitted");
+    } catch (error) {
+        setStatus(error.message, "error");
+    } finally {
+        setBusy("backupFilesBtn", false);
+    }
+}
+
+function withRecordContext(rows, record) {
+    return rows.map((row) => ({
+        ...row,
+        record_id: record ? record.id : row.record_id,
+        action: record ? record.action : row.action,
+        job_instance_id: record ? record.job_instance_id : row.job_instance_id,
+    }));
+}
+
+function fileResultKey(row) {
+    return encodeURIComponent(JSON.stringify([
+        row.record_id || "",
+        row.bk_host_id || "",
+        row.bk_file_list || row.log_content || row.message || "",
+        row.bk_file_cnt ?? "",
+        row.bk_file_total_size ?? "",
+    ]));
+}
+
+function renderFileResults(rows) {
+    if (Array.isArray(rows)) {
+        state.fileResults = rows.map((row) => ({
+            ...row,
+            archive_key: row.archive_key || fileResultKey(row),
+        }));
+    }
+    const box = document.getElementById("fileResults");
+    box.innerHTML = "";
+    if (!state.fileResults.length) {
+        box.innerHTML = '<div class="empty">No file result returned yet</div>';
+        updateArchiveControls();
+        return;
+    }
+    const visibleRows = state.fileResults.filter((row) => (
+        state.showArchivedFileResults || !archivedFileResultKeys.has(row.archive_key)
+    ));
+    if (!visibleRows.length) {
+        box.innerHTML = '<div class="empty">All file results are archived. Use Show Archived to review them.</div>';
+        updateArchiveControls();
+        return;
+    }
+    visibleRows.forEach((row) => {
+        const card = document.createElement("div");
+        const archived = archivedFileResultKeys.has(row.archive_key);
+        card.className = archived ? "result-card archived" : "result-card";
+        const selected = selectedFileResultKeys.has(row.archive_key);
+        const titleHtml = state.fileSelectionMode
+            ? `<label class="selectable-heading"><input type="checkbox" data-file-select="${escapeHtml(row.archive_key)}" ${selected ? "checked" : ""}> <strong>Host ${escapeHtml(row.bk_host_id || "")}</strong></label>`
+            : `<strong>Host ${escapeHtml(row.bk_host_id || "")}</strong>`;
+        const actionHtml = state.fileSelectionMode
+            ? ""
+            : `<button class="btn-link" type="button" data-file-result="${escapeHtml(row.archive_key)}">${archived ? "Restore" : "Archive"}</button>`;
+        const fileText = row.bk_file_list || row.log_content || row.message || "";
+        const fileLabel = row.message && !row.bk_file_list && !row.log_content ? "Summary" : "Files";
+        const countLine = row.bk_file_cnt !== "" && row.bk_file_cnt !== null && row.bk_file_cnt !== undefined
+            ? `<span>Count: ${escapeHtml(row.bk_file_cnt)}</span>`
+            : "";
+        const sizeLine = row.bk_file_total_size !== "" && row.bk_file_total_size !== null && row.bk_file_total_size !== undefined
+            ? `<span>Total size: ${escapeHtml(row.bk_file_total_size)}</span>`
+            : "";
+        card.innerHTML = `
+            <div class="result-card-header">
+                ${titleHtml}
+                ${actionHtml}
+            </div>
+            ${fileText ? `<span>${fileLabel}: ${escapeHtml(fileText)}</span>` : ""}
+            ${countLine}
+            ${sizeLine}
+        `;
+        box.appendChild(card);
+    });
+    updateArchiveControls();
+}
+
+function renderStoredFileResults() {
+    const rows = state.records
+        .filter((record) => ["search", "backup"].includes(record.action))
+        .filter((record) => record.result_summary || record.error_message)
+        .map((record) => ({
+            record_id: record.id,
+            action: record.action,
+            job_instance_id: record.job_instance_id,
+            bk_host_id: record.bk_host_ids,
+            message: `${record.action} #${record.job_instance_id}: ${record.result_summary || record.error_message}`,
+            bk_file_cnt: "",
+            bk_file_total_size: "",
+        }));
+    if (rows.length) {
+        renderFileResults(rows);
+    }
+}
+
+async function loadRecords(options = {}) {
+    try {
+        state.records = await requestJson(endpoints.records);
+        renderRecords();
+        renderStoredFileResults();
+        updateRecordAutoRefresh();
+        if (options.refreshActive) {
+            await refreshActiveRecords({ silent: true });
+        }
+    } catch (error) {
+        setStatus(error.message, "error");
+    }
+}
+
+function isActiveRecord(record) {
+    const status = Number(record.status);
+    if (TERMINAL_STATUS_CODES.has(status)) {
+        return false;
+    }
+    if (ACTIVE_STATUS_CODES.has(status)) {
+        return true;
+    }
+    return ACTIVE_STATUS_TEXTS.has(String(record.status_text || "").toLowerCase());
+}
+
+function getStatusTone(record) {
+    const status = Number(record.status);
+    const statusText = String(record.status_text || "").toLowerCase();
+    if (status === 3 || statusText === "success") {
+        return "success";
+    }
+    if ([4, 9, 10, 11, 13].includes(status) || ["failed", "state abnormal", "stopping", "terminated"].includes(statusText)) {
+        return "error";
+    }
+    return "";
+}
+
+function updateRecordAutoRefresh() {
+    const hasActiveRecord = state.records.some(isActiveRecord);
+    if (hasActiveRecord && !recordRefreshTimer) {
+        recordRefreshTimer = window.setInterval(() => {
+            refreshActiveRecords({ silent: true });
+        }, RECORD_REFRESH_INTERVAL_MS);
+    }
+    if (!hasActiveRecord && recordRefreshTimer) {
+        window.clearInterval(recordRefreshTimer);
+        recordRefreshTimer = null;
+    }
+}
+
+function updateArchiveControls() {
+    const fileToggle = document.getElementById("toggleFileArchiveBtn");
+    const fileSelect = document.getElementById("selectFileResultsBtn");
+    const fileSelectArchived = document.getElementById("selectArchivedFileResultsBtn");
+    const fileSelectUnarchived = document.getElementById("selectUnarchivedFileResultsBtn");
+    const fileInvertSelection = document.getElementById("invertFileResultSelectionBtn");
+    const fileArchiveSelected = document.getElementById("archiveSelectedFileResultsBtn");
+    const fileRestoreSelected = document.getElementById("restoreSelectedFileResultsBtn");
+    const recordToggle = document.getElementById("toggleRecordArchiveBtn");
+    const recordSelect = document.getElementById("selectRecordsBtn");
+    const recordSelectArchived = document.getElementById("selectArchivedRecordsBtn");
+    const recordSelectUnarchived = document.getElementById("selectUnarchivedRecordsBtn");
+    const recordInvertSelection = document.getElementById("invertRecordSelectionBtn");
+    const recordArchiveSelected = document.getElementById("archiveSelectedRecordsBtn");
+    const recordRestoreSelected = document.getElementById("restoreSelectedRecordsBtn");
+    const selectedFileRows = state.fileResults.filter((row) => selectedFileResultKeys.has(row.archive_key));
+    const selectedRecords = state.records.filter((record) => selectedRecordIds.has(String(record.id)));
+    fileToggle.textContent = `${state.showArchivedFileResults ? "Hide" : "Show"} Archived (${archivedFileResultKeys.size})`;
+    fileSelect.textContent = state.fileSelectionMode ? "Done" : "Select";
+    fileSelectArchived.style.display = state.fileSelectionMode ? "" : "none";
+    fileSelectUnarchived.style.display = state.fileSelectionMode ? "" : "none";
+    fileInvertSelection.style.display = state.fileSelectionMode ? "" : "none";
+    fileArchiveSelected.style.display = state.fileSelectionMode ? "" : "none";
+    fileRestoreSelected.style.display = state.fileSelectionMode ? "" : "none";
+    recordToggle.textContent = `${state.showArchivedRecords ? "Hide" : "Show"} Archived (${archivedRecordIds.size})`;
+    recordSelect.textContent = state.recordSelectionMode ? "Done" : "Select";
+    recordSelectArchived.style.display = state.recordSelectionMode ? "" : "none";
+    recordSelectUnarchived.style.display = state.recordSelectionMode ? "" : "none";
+    recordInvertSelection.style.display = state.recordSelectionMode ? "" : "none";
+    recordArchiveSelected.style.display = state.recordSelectionMode ? "" : "none";
+    recordRestoreSelected.style.display = state.recordSelectionMode ? "" : "none";
+    document.querySelectorAll(".record-selection-column").forEach((cell) => {
+        cell.style.display = state.recordSelectionMode ? "" : "none";
+    });
+    fileSelectArchived.disabled = !state.fileResults.some((row) => archivedFileResultKeys.has(row.archive_key));
+    fileSelectUnarchived.disabled = !state.fileResults.some((row) => !archivedFileResultKeys.has(row.archive_key));
+    fileInvertSelection.disabled = state.fileResults.length === 0;
+    fileArchiveSelected.disabled = !selectedFileRows.some((row) => !archivedFileResultKeys.has(row.archive_key));
+    fileRestoreSelected.disabled = !selectedFileRows.some((row) => archivedFileResultKeys.has(row.archive_key));
+    recordSelectArchived.disabled = !state.records.some((record) => archivedRecordIds.has(String(record.id)));
+    recordSelectUnarchived.disabled = !state.records.some((record) => !archivedRecordIds.has(String(record.id)));
+    recordInvertSelection.disabled = state.records.length === 0;
+    recordArchiveSelected.disabled = !selectedRecords.some((record) => !archivedRecordIds.has(String(record.id)));
+    recordRestoreSelected.disabled = !selectedRecords.some((record) => archivedRecordIds.has(String(record.id)));
+}
+
+function toggleFileResultArchive(key) {
+    if (archivedFileResultKeys.has(key)) {
+        archivedFileResultKeys.delete(key);
+    } else {
+        archivedFileResultKeys.add(key);
+    }
+    saveStoredSet(`${archiveStoragePrefix}:archivedFileResults`, archivedFileResultKeys);
+    renderFileResults();
+}
+
+function archiveSelectedFileResults() {
+    selectedFileResultKeys.forEach((key) => archivedFileResultKeys.add(key));
+    selectedFileResultKeys.clear();
+    saveStoredSet(`${archiveStoragePrefix}:archivedFileResults`, archivedFileResultKeys);
+    renderFileResults();
+}
+
+function restoreSelectedFileResults() {
+    selectedFileResultKeys.forEach((key) => archivedFileResultKeys.delete(key));
+    selectedFileResultKeys.clear();
+    saveStoredSet(`${archiveStoragePrefix}:archivedFileResults`, archivedFileResultKeys);
+    renderFileResults();
+}
+
+function selectFileResultsByArchiveState(archived) {
+    selectedFileResultKeys.clear();
+    state.fileResults.forEach((row) => {
+        if (archivedFileResultKeys.has(row.archive_key) === archived) {
+            selectedFileResultKeys.add(row.archive_key);
+        }
+    });
+    renderFileResults();
+}
+
+function invertFileResultSelection() {
+    state.fileResults.forEach((row) => {
+        if (selectedFileResultKeys.has(row.archive_key)) {
+            selectedFileResultKeys.delete(row.archive_key);
+        } else {
+            selectedFileResultKeys.add(row.archive_key);
+        }
+    });
+    renderFileResults();
+}
+
+function toggleRecordArchive(recordId) {
+    const key = String(recordId);
+    if (archivedRecordIds.has(key)) {
+        archivedRecordIds.delete(key);
+    } else {
+        archivedRecordIds.add(key);
+    }
+    saveStoredSet(`${archiveStoragePrefix}:archivedRecords`, archivedRecordIds);
+    renderRecords();
+    updateArchiveControls();
+}
+
+function archiveSelectedRecords() {
+    selectedRecordIds.forEach((key) => archivedRecordIds.add(key));
+    selectedRecordIds.clear();
+    saveStoredSet(`${archiveStoragePrefix}:archivedRecords`, archivedRecordIds);
+    renderRecords();
+    updateArchiveControls();
+}
+
+function restoreSelectedRecords() {
+    selectedRecordIds.forEach((key) => archivedRecordIds.delete(key));
+    selectedRecordIds.clear();
+    saveStoredSet(`${archiveStoragePrefix}:archivedRecords`, archivedRecordIds);
+    renderRecords();
+    updateArchiveControls();
+}
+
+function selectRecordsByArchiveState(archived) {
+    selectedRecordIds.clear();
+    state.records.forEach((record) => {
+        const key = String(record.id);
+        if (archivedRecordIds.has(key) === archived) {
+            selectedRecordIds.add(key);
+        }
+    });
+    renderRecords();
+    updateArchiveControls();
+}
+
+function invertRecordSelection() {
+    state.records.forEach((record) => {
+        const key = String(record.id);
+        if (selectedRecordIds.has(key)) {
+            selectedRecordIds.delete(key);
+        } else {
+            selectedRecordIds.add(key);
+        }
+    });
+    renderRecords();
+    updateArchiveControls();
+}
+
+function renderRecords() {
+    const tbody = document.getElementById("recordTableBody");
+    tbody.innerHTML = "";
+    if (!state.records.length) {
+        tbody.innerHTML = '<tr><td class="empty" colspan="8">No execution records</td></tr>';
+        updateArchiveControls();
+        return;
+    }
+    const visibleRecords = state.records.filter((record) => (
+        state.showArchivedRecords || !archivedRecordIds.has(String(record.id))
+    ));
+    if (!visibleRecords.length) {
+        tbody.innerHTML = '<tr><td class="empty" colspan="8">All execution records are archived. Use Show Archived to review them.</td></tr>';
+        updateArchiveControls();
+        return;
+    }
+    visibleRecords.forEach((record) => {
+        const row = document.createElement("tr");
+        const statusTone = getStatusTone(record);
+        const archived = archivedRecordIds.has(String(record.id));
+        const recordId = String(record.id);
+        const selected = selectedRecordIds.has(recordId);
+        row.className = archived ? "archived-record" : "";
+        row.innerHTML = `
+            <td class="select-cell record-selection-column"><input type="checkbox" data-record-select="${escapeHtml(recordId)}" ${selected ? "checked" : ""}></td>
+            <td>${escapeHtml(record.created_at)}</td>
+            <td>${escapeHtml(record.action)}</td>
+            <td><a href="${escapeHtml(record.job_url)}" target="_blank">${escapeHtml(record.job_instance_id || "")}</a></td>
+            <td><span class="badge ${statusTone}">${escapeHtml(record.status_text)}</span></td>
+            <td>${escapeHtml(record.bk_host_ids)}</td>
+            <td>${escapeHtml(record.result_summary || record.error_message || "")}</td>
+            <td>
+                <div class="row-actions">
+                    <button class="btn-link" type="button" data-record="${escapeHtml(record.id)}">Refresh</button>
+                    ${state.recordSelectionMode ? "" : `<button class="btn-link" type="button" data-archive-record="${escapeHtml(record.id)}">${archived ? "Restore" : "Archive"}</button>`}
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    updateArchiveControls();
+}
+
+async function refreshRecord(recordId) {
+    try {
+        setStatus("Refreshing status...");
+        const data = await requestJson(`${endpoints.records}${recordId}/refresh/`, {
+            method: "POST",
+            body: "{}",
+        });
+        if (data.logs && data.logs.length) {
+            renderFileResults(withRecordContext(data.logs, data.record));
+        }
+        await loadRecords();
+        setStatus("");
+    } catch (error) {
+        setStatus(error.message, "error");
+    }
+}
+
+async function refreshActiveRecords(options = {}) {
+    if (recordsRefreshing || document.hidden) {
+        return;
+    }
+    const activeRecords = state.records.filter(isActiveRecord);
+    if (!activeRecords.length) {
+        updateRecordAutoRefresh();
+        return;
+    }
+    recordsRefreshing = true;
+    try {
+        if (!options.silent) {
+            setStatus("Refreshing active job records...");
+        }
+        let latestLogs = [];
+        for (const record of activeRecords) {
+            const data = await requestJson(`${endpoints.records}${record.id}/refresh/`, {
+                method: "POST",
+                body: "{}",
+            });
+            if (data.logs && data.logs.length) {
+                latestLogs = withRecordContext(data.logs, data.record);
+            }
+        }
+        if (latestLogs.length) {
+            renderFileResults(latestLogs);
+        }
+        await loadRecords();
+        if (!options.silent) {
+            setStatus("");
+        }
+    } catch (error) {
+        setStatus(error.message, "error");
+    } finally {
+        recordsRefreshing = false;
+    }
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function initGuideModal(storageKey) {
+    const modal = document.getElementById("guideModal");
+    if (!modal) return;
+    const slides = Array.from(modal.querySelectorAll("[data-guide-slide]"));
+    const prev = document.getElementById("guidePrev");
+    const next = document.getElementById("guideNext");
+    const dots = document.getElementById("guideDots");
+    if (!slides.length || !prev || !next || !dots) return;
+    let index = 0;
+
+    function storageGet() {
+        try { return window.localStorage.getItem(storageKey); } catch (error) { return "1"; }
+    }
+
+    function storageSet() {
+        try { window.localStorage.setItem(storageKey, "1"); } catch (error) { return; }
+    }
+
+    function render() {
+        slides.forEach((slide, slideIndex) => {
+            slide.classList.toggle("active", slideIndex === index);
+        });
+        dots.innerHTML = slides.map((_, dotIndex) => `<button type="button" class="${dotIndex === index ? "active" : ""}" data-guide-dot="${dotIndex}" aria-label="Go to page ${dotIndex + 1}"></button>`).join("");
+        prev.disabled = index === 0;
+        next.textContent = index === slides.length - 1 ? "Done" : "Next";
+    }
+
+    function openGuide(autoOpen) {
+        index = 0;
+        render();
+        modal.hidden = false;
+        document.body.classList.add("guide-open");
+        if (autoOpen) storageSet();
+    }
+
+    function closeGuide() {
+        modal.hidden = true;
+        document.body.classList.remove("guide-open");
+    }
+
+    document.querySelectorAll("[data-guide-open]").forEach((button) => {
+        button.addEventListener("click", () => openGuide(false));
+    });
+    modal.querySelectorAll("[data-guide-close]").forEach((button) => {
+        button.addEventListener("click", closeGuide);
+    });
+    prev.addEventListener("click", () => {
+        index = Math.max(0, index - 1);
+        render();
+    });
+    next.addEventListener("click", () => {
+        if (index === slides.length - 1) {
+            closeGuide();
+            return;
+        }
+        index = Math.min(slides.length - 1, index + 1);
+        render();
+    });
+    dots.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-guide-dot]");
+        if (!button) return;
+        index = Number(button.dataset.guideDot);
+        render();
+    });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) closeGuide();
+    });
+    if (storageGet() !== "1") {
+        window.setTimeout(() => openGuide(true), 450);
+    }
+}
+
+function applyBackground(name) {
+    const selected = visualAssets.backgrounds[name] ? name : "lighthouse";
+    document.documentElement.style.setProperty("--page-bg", `url("${visualAssets.backgrounds[selected]}")`);
+    document.querySelectorAll("#backgroundTools button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.bg === selected);
+    });
+    window.localStorage.setItem("jobConsoleBackground", selected);
+}
+
+function initBackgroundTools() {
+    const stored = window.localStorage.getItem("jobConsoleBackground") || "lighthouse";
+    applyBackground(stored);
+    document.getElementById("backgroundTools").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-bg]");
+        if (button) {
+            applyBackground(button.dataset.bg);
+        }
+    });
+}
+
+function initPet() {
+    const dock = document.getElementById("petDock");
+    const body = document.getElementById("petBody");
+    const select = document.getElementById("petSelect");
+    const reset = document.getElementById("petReset");
+    const savedPet = window.localStorage.getItem("jobConsolePet") || "noa";
+    const state = {
+        x: 0,
+        y: 0,
+        velocityY: 0,
+        dragging: false,
+        dragOffsetX: 0,
+        dragOffsetY: 0,
+        lastTime: performance.now(),
+    };
+
+    function size() {
+        return {
+            width: dock.offsetWidth || 168,
+            height: dock.offsetHeight || 220,
+        };
+    }
+
+    function floorY() {
+        return Math.max(12, window.innerHeight - size().height - 18);
+    }
+
+    function clampPosition() {
+        const box = size();
+        state.x = Math.min(Math.max(10, state.x), Math.max(10, window.innerWidth - box.width - 10));
+        state.y = Math.min(Math.max(10, state.y), floorY());
+    }
+
+    function resetPosition() {
+        const box = size();
+        state.x = Math.max(10, window.innerWidth - box.width - 28);
+        state.y = floorY();
+        state.velocityY = 0;
+        render(performance.now());
+    }
+
+    function setPet(name) {
+        const selected = visualAssets.pets[name] ? name : "noa";
+        body.src = visualAssets.pets[selected];
+        body.alt = selected.charAt(0).toUpperCase() + selected.slice(1);
+        select.value = selected;
+        window.localStorage.setItem("jobConsolePet", selected);
+    }
+
+    function render(time) {
+        const bob = state.dragging ? 0 : Math.sin(time / 640) * 4;
+        const sway = state.dragging ? 0 : Math.sin(time / 1200) * 3;
+        dock.style.transform = `translate3d(${state.x + sway}px, ${state.y + bob}px, 0)`;
+    }
+
+    function animate(time) {
+        const delta = Math.min(32, time - state.lastTime);
+        state.lastTime = time;
+        if (!state.dragging) {
+            const floor = floorY();
+            if (state.y < floor || state.velocityY > 0.01) {
+                state.velocityY += 0.0024 * delta;
+                state.y += state.velocityY * delta;
+                if (state.y > floor) {
+                    state.y = floor;
+                    state.velocityY = 0;
+                }
+            }
+            clampPosition();
+        }
+        render(time);
+        window.requestAnimationFrame(animate);
+    }
+
+    body.addEventListener("dragstart", (event) => {
+        event.preventDefault();
+    });
+
+    body.addEventListener("pointerdown", (event) => {
+        if (!event.isPrimary) return;
+        event.preventDefault();
+        state.dragging = true;
+        state.velocityY = 0;
+        state.dragOffsetX = event.clientX - state.x;
+        state.dragOffsetY = event.clientY - state.y;
+        body.setPointerCapture(event.pointerId);
+    });
+
+    body.addEventListener("pointermove", (event) => {
+        if (!state.dragging) return;
+        state.x = event.clientX - state.dragOffsetX;
+        state.y = event.clientY - state.dragOffsetY;
+        clampPosition();
+        render(performance.now());
+    });
+
+    body.addEventListener("pointerup", (event) => {
+        state.dragging = false;
+        state.velocityY = 0;
+        body.releasePointerCapture(event.pointerId);
+    });
+
+    body.addEventListener("pointercancel", () => {
+        state.dragging = false;
+    });
+
+    select.addEventListener("change", () => setPet(select.value));
+    reset.addEventListener("click", resetPosition);
+    document.addEventListener("keydown", (event) => {
+        if (event.key.toLowerCase() === "r" && !event.ctrlKey && !event.altKey && !event.metaKey) {
+            const tagName = document.activeElement ? document.activeElement.tagName : "";
+            if (!["INPUT", "SELECT", "TEXTAREA"].includes(tagName)) {
+                resetPosition();
+            }
+        }
+    });
+    window.addEventListener("resize", resetPosition);
+    setPet(savedPet);
+    window.setTimeout(resetPosition, 50);
+    window.requestAnimationFrame(animate);
+}
+
+document.getElementById("loadHostsBtn").addEventListener("click", loadHosts);
+document.getElementById("reloadPlansBtn").addEventListener("click", loadPlans);
+document.getElementById("searchFilesBtn").addEventListener("click", searchFiles);
+document.getElementById("backupFilesBtn").addEventListener("click", backupFiles);
+document.getElementById("toggleFileArchiveBtn").addEventListener("click", () => {
+    state.showArchivedFileResults = !state.showArchivedFileResults;
+    renderFileResults();
+});
+document.getElementById("selectFileResultsBtn").addEventListener("click", () => {
+    state.fileSelectionMode = !state.fileSelectionMode;
+    if (!state.fileSelectionMode) {
+        selectedFileResultKeys.clear();
+    }
+    renderFileResults();
+});
+document.getElementById("selectArchivedFileResultsBtn").addEventListener("click", () => selectFileResultsByArchiveState(true));
+document.getElementById("selectUnarchivedFileResultsBtn").addEventListener("click", () => selectFileResultsByArchiveState(false));
+document.getElementById("invertFileResultSelectionBtn").addEventListener("click", invertFileResultSelection);
+document.getElementById("archiveSelectedFileResultsBtn").addEventListener("click", archiveSelectedFileResults);
+document.getElementById("restoreSelectedFileResultsBtn").addEventListener("click", restoreSelectedFileResults);
+document.getElementById("toggleRecordArchiveBtn").addEventListener("click", () => {
+    state.showArchivedRecords = !state.showArchivedRecords;
+    renderRecords();
+});
+document.getElementById("selectRecordsBtn").addEventListener("click", () => {
+    state.recordSelectionMode = !state.recordSelectionMode;
+    if (!state.recordSelectionMode) {
+        selectedRecordIds.clear();
+    }
+    renderRecords();
+});
+document.getElementById("selectArchivedRecordsBtn").addEventListener("click", () => selectRecordsByArchiveState(true));
+document.getElementById("selectUnarchivedRecordsBtn").addEventListener("click", () => selectRecordsByArchiveState(false));
+document.getElementById("invertRecordSelectionBtn").addEventListener("click", invertRecordSelection);
+document.getElementById("archiveSelectedRecordsBtn").addEventListener("click", archiveSelectedRecords);
+document.getElementById("restoreSelectedRecordsBtn").addEventListener("click", restoreSelectedRecords);
+document.getElementById("fileResults").addEventListener("change", (event) => {
+    const input = event.target.closest("input[data-file-select]");
+    if (!input) {
+        return;
+    }
+    if (input.checked) {
+        selectedFileResultKeys.add(input.dataset.fileSelect);
+    } else {
+        selectedFileResultKeys.delete(input.dataset.fileSelect);
+    }
+    updateArchiveControls();
+});
+document.getElementById("fileResults").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-file-result]");
+    if (button) {
+        toggleFileResultArchive(button.dataset.fileResult);
+    }
+});
+document.getElementById("planTableBody").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-plan]");
+    if (button) {
+        document.getElementById("searchPlanSelect").value = button.dataset.plan;
+        document.getElementById("backupPlanSelect").value = button.dataset.plan;
+    }
+});
+document.getElementById("recordTableBody").addEventListener("change", (event) => {
+    const input = event.target.closest("input[data-record-select]");
+    if (!input) {
+        return;
+    }
+    if (input.checked) {
+        selectedRecordIds.add(input.dataset.recordSelect);
+    } else {
+        selectedRecordIds.delete(input.dataset.recordSelect);
+    }
+    updateArchiveControls();
+});
+document.getElementById("recordTableBody").addEventListener("click", (event) => {
+    const archiveButton = event.target.closest("button[data-archive-record]");
+    if (archiveButton) {
+        toggleRecordArchive(archiveButton.dataset.archiveRecord);
+        return;
+    }
+    const button = event.target.closest("button[data-record]");
+    if (button) {
+        refreshRecord(button.dataset.record);
+    }
+});
+document.getElementById("bizSelect").addEventListener("change", () => {
+    state.hosts = [];
+    state.plans = [];
+    renderHosts();
+    renderPlans();
+    fillPlanSelects();
+});
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+        loadRecords({ refreshActive: true });
+    }
+});
+
+renderHosts();
+renderPlans();
+renderFileResults([]);
+renderRecords();
+initGuideModal("job-console.guide.seen.v1");
+initBackgroundTools();
+initPet();
+loadBusinesses();
+loadRecords({ refreshActive: true });
+</script>
+</body>
+</html>
+
