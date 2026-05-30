@@ -248,9 +248,34 @@
             background: #f8fbff;
         }
 
+        .iframe-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            color: var(--muted);
+            background: #fff;
+            border-bottom: 1px solid #dce4ef;
+            font-size: 12px;
+        }
+
+        .iframe-toolbar a {
+            color: #245fc7;
+            text-decoration: none;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .iframe-status {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .iframe-wrap iframe {
             width: 100%;
-            height: 720px;
+            height: 680px;
             border: 0;
         }
 
@@ -1294,16 +1319,43 @@ function initPet() {
 function renderBkvisionEmbed(url) {
     const wrap = document.getElementById("bkvisionFrameWrap");
     if (!wrap) return;
-    const safeUrl = String(url || "").trim();
+    const safeUrl = normalizeBkvisionUrl(url);
     if (!safeUrl) {
         wrap.innerHTML = '<div class="empty" id="bkvisionEmpty">Configure BKVision dashboard URL from Backend settings or platform variables.</div>';
         return;
     }
     const iframe = document.createElement("iframe");
-    iframe.src = safeUrl.replace(/^http:\/\//, "https://");
+    iframe.src = safeUrl;
     iframe.title = "BKVision Dashboard";
     wrap.innerHTML = "";
+    const toolbar = document.createElement("div");
+    toolbar.className = "iframe-toolbar";
+    toolbar.innerHTML = `
+        <span class="iframe-status">Embedding BKVision from ${escapeHtml(new URL(safeUrl).host)}</span>
+        <a href="${escapeHtml(safeUrl)}" target="_blank" rel="noreferrer">Open BKVision</a>
+    `;
+    wrap.appendChild(toolbar);
     wrap.appendChild(iframe);
+}
+
+function normalizeBkvisionUrl(value) {
+    const rawValue = String(value || "").trim();
+    if (!rawValue) {
+        return "";
+    }
+    let url = rawValue;
+    const srcMatch = rawValue.match(/\bsrc\s*=\s*["']([^"']+)["']/i);
+    if (srcMatch) {
+        url = srcMatch[1];
+    }
+    const decodedUrl = url.replace(/&amp;/g, "&").trim();
+    if (!/^https?:\/\//i.test(decodedUrl)) {
+        return "";
+    }
+    if (window.location.protocol === "https:" && decodedUrl.indexOf("http://") === 0) {
+        return `https://${decodedUrl.slice("http://".length)}`;
+    }
+    return decodedUrl;
 }
 
 async function loadBkvisionConfig() {
